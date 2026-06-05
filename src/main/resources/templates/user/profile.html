@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thông tin cá nhân</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .avatar-preview { width: 140px; height: 140px; object-fit: cover; border-radius: 50%; border: 3px solid #e9ecef; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <a th:href="@{/}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Quay lại
+                        </a>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-4 position-relative">
+                            <img th:if="${user.avatar != null}" th:src="@{/profile/avatar}" class="avatar-preview" alt="Avatar">
+                            <img th:if="${user.avatar == null and user.avatarUrl != null}" th:src="${user.avatarUrl}" class="avatar-preview" alt="Avatar">
+                            <div th:if="${user.avatar == null and user.avatarUrl == null}" class="d-flex align-items-center justify-content-center avatar-preview bg-secondary text-white">
+                                <i class="bi bi-person fs-1"></i>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle" 
+                                    style="width: 36px; height: 36px; padding: 0;" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#avatarModal"
+                                    title="Cập nhật ảnh đại diện">
+                                <i class="bi bi-camera"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <h3 class="mb-1" th:text="${user.hoTen != null ? user.hoTen : user.username}">User</h3>
+                            <div class="text-muted" th:text="${user.email}">email@example.com</div>
+                            <div class="mt-2">
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Đã đăng nhập
+                                </span>
+                                <span class="badge bg-info ms-2" th:text="${user.getRoleFromVaiTro() == 'ROLE_ADMIN' ? 'Quản trị viên' : 'Người dùng'}">Người dùng</span>
+                                <span class="badge bg-secondary ms-2">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    <span th:text="${T(util.DateUtils).getTimeSinceRegistration(user.ngayTao)}">Vừa mới đăng ký</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                        <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <div th:if="${param.error != null}" class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span th:if="${param.error[0] == 'AvatarTooLarge'}">Ảnh vượt quá 3MB. Vui lòng chọn ảnh nhỏ hơn!</span>
+                        <span th:if="${param.error[0] == 'UpdateFailed'}">Cập nhật thất bại. Vui lòng thử lại!</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <span th:if="${param.success[0] == 'AvatarUpdated'}">Cập nhật ảnh đại diện thành công!</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+      <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <strong>Tên đăng nhập:</strong>
+                                    <span class="ms-2" th:text="${user.username}"></span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Họ và tên:</strong>
+                                    <span class="ms-2" th:text="${user.hoTen}"></span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Email:</strong>
+                                    <span class="ms-2" th:text="${user.email}"></span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Thời gian đăng ký:</strong>
+                                    <div class="ms-2">
+                                        <div th:text="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}"></div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock-history me-1"></i>
+                                            <span th:text="${T(util.DateUtils).getTimeSinceRegistration(user.ngayTao)}">Vừa mới đăng ký</span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <strong>Số điện thoại:</strong>
+                                    <span class="ms-2" th:text="${user.soDienThoai}"></span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Địa chỉ:</strong>
+                                    <span class="ms-2" th:text="${user.diaChi}"></span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>File CV:</strong>
+                                        <span class="ms-2" th:text="${user.cvFileName != null ? user.cvFileName : 'Chưa có'}"></span>
+                                    </div>
+                                    <div th:if="${user.cvData != null}">
+                                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/profile/cv}" th:attr="download=${user.cvFileName}"><i class="bi bi-file-earmark-arrow-down"></i> Tải</a>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Hành động:</strong>
+                                    </div>
+                                    <div>
+                                        <a th:href="@{/profile/export-all}" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-download"></i> Xuất file</a>
+                                        <a class="btn btn-sm btn-primary" th:href="@{/profile/update}"><i class="bi bi-pencil"></i> Cập nhật</a>
+                                    </div>
+                                </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Yêu cầu cập nhật thông tin -->
+  <div class="row mt-4" th:if="${requests != null and !requests.isEmpty()}">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" 
+             style="cursor: pointer;" 
+             data-bs-toggle="collapse" 
+             data-bs-target="#updateRequestsCollapse" 
+             aria-expanded="true" 
+             aria-controls="updateRequestsCollapse">
+          <h5 class="mb-0"><i class="bi bi-file-earmark-check me-2"></i>Lịch sử yêu cầu cập nhật</h5>
+          <i class="bi bi-chevron-down" id="updateRequestsChevron"></i>
+        </div>
+        <div class="collapse show" id="updateRequestsCollapse">
+          <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Mã yêu cầu</th>
+                  <th>Ngày gửi</th>
+                  <th>Nội dung thay đổi</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày xử lý</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="request : ${requests}">
+                  <td>
+                    <strong th:text="'#' + ${request.id}">#1</strong>
+                  </td>
+                  <td>
+                    <div th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                    <small class="text-muted">
+                      <i class="bi bi-clock-history me-1"></i>
+                      <span th:text="${T(util.DateUtils).getTimeSinceRegistration(request.createdAt)}">Vừa mới</span>
+                    </small>
+                  </td>
+                  <td>
+                    <div class="d-flex flex-wrap gap-1">
+                      <span th:if="${request.hasNewFullName}" class="badge bg-info">Họ tên</span>
+                      <span th:if="${request.hasNewPhone}" class="badge bg-info">SĐT</span>
+                      <span th:if="${request.hasNewAddress}" class="badge bg-info">Địa chỉ</span>
+                      <span th:if="${request.hasNewAvatar}" class="badge bg-info">Ảnh đại diện</span>
+                      <span th:if="${!request.hasNewFullName and !request.hasNewPhone and !request.hasNewAddress and !request.hasNewAvatar}" 
+                            class="text-muted">Không có thay đổi</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span th:if="${request.status == 'PENDING'}" class="badge bg-warning text-dark">
+                      <i class="bi bi-clock me-1"></i>Chờ duyệt
+                    </span>
+                    <span th:if="${request.status == 'APPROVED'}" class="badge bg-info">
+                      <i class="bi bi-check-circle me-1"></i>Đã duyệt
+                    </span>
+                    <span th:if="${request.status == 'COMPLETED'}" class="badge bg-success">
+                      <i class="bi bi-check2-all me-1"></i>Đã hoàn thành
+                    </span>
+                    <span th:if="${request.status == 'REJECTED'}" class="badge bg-danger">
+                      <i class="bi bi-x-circle me-1"></i>Từ chối
+                    </span>
+                  </td>
+                  <td>
+                    <span th:if="${request.processedAt != null}" 
+                          th:text="${#temporals.format(request.processedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                    <span th:if="${request.processedAt == null}" class="text-muted">-</span>
+                  </td>
+                  <td>
+                    <a th:href="@{/profile/update-request/{id}(id=${request.id})}" 
+                       class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-eye me-1"></i>Chi tiết
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Thông báo khi chưa có yêu cầu nào -->
+  <div class="row mt-4" th:if="${requests == null or requests.isEmpty()}">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-file-earmark-text fs-1 text-muted mb-3"></i>
+          <h5 class="text-muted">Chưa có yêu cầu cập nhật nào</h5>
+          <p class="text-muted mb-0">Bạn có thể <a th:href="@{/profile/update}">gửi yêu cầu cập nhật thông tin</a> để thay đổi thông tin cá nhân.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+                </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Avatar Update Modal -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="avatarModalLabel">
+                    <i class="bi bi-camera me-2"></i>Cập nhật ảnh đại diện
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" id="avatarForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div class="mb-3">
+                        <label for="avatarFile" class="form-label">Chọn ảnh đại diện mới</label>
+                        <input type="file" class="form-control" id="avatarFile" name="avatar" accept="image/*" required>
+                        <div class="form-text">Tối đa 3MB. Định dạng: JPG, PNG, GIF.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Xem trước:</label>
+                        <div class="text-center">
+                            <img id="avatarPreview" src="#" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px; display: none; border-radius: 50%;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="avatarForm" id="avatarSubmitBtn" class="btn btn-primary">
+                    <span id="avatarSubmitText"><i class="bi bi-send me-2"></i>Gửi yêu cầu duyệt</span>
+                    <span id="avatarSubmitSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div id="avatarSuccessToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong class="me-auto">Thành công</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="avatarSuccessToastBody"></div>
+    </div>
+    <div id="avatarErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <strong class="me-auto">Lỗi</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="avatarErrorToastBody"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="_csrf"]') ? 
+        document.querySelector('meta[name="_csrf"]').getAttribute('content') : '';
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]') ? 
+        document.querySelector('meta[name="_csrf_header"]').getAttribute('content') : 'X-CSRF-TOKEN';
+    
+    // Preview avatar before upload
+    document.getElementById('avatarFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 3 * 1024 * 1024) {
+                alert('Ảnh vượt quá 3MB. Vui lòng chọn ảnh nhỏ hơn!');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatarPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Handle avatar form submission with AJAX
+    const avatarForm = document.getElementById('avatarForm');
+    if (avatarForm) {
+        avatarForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('avatarSubmitBtn');
+            const submitText = document.getElementById('avatarSubmitText');
+            const submitSpinner = document.getElementById('avatarSubmitSpinner');
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitText.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Đang gửi...';
+            submitSpinner.classList.remove('d-none');
+            
+            // Create FormData
+            const formData = new FormData(avatarForm);
+            
+            // Send AJAX request
+            fetch('/profile/update-avatar', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
+            })
+            .then(response => {
+                if (response.redirected) {
+                    // If redirected, it means success (Spring redirects on success)
+                    const successToast = new bootstrap.Toast(document.getElementById('avatarSuccessToast'));
+                    document.getElementById('avatarSuccessToastBody').textContent = 
+                        'Đã gửi yêu cầu cập nhật ảnh đại diện thành công! Vui lòng chờ admin duyệt.';
+                    successToast.show();
+                    
+                    // Close modal after 1 second
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('avatarModal'));
+                        modal.hide();
+                        avatarForm.reset();
+                        document.getElementById('avatarPreview').style.display = 'none';
+                    }, 1500);
+                } else {
+                    return response.text().then(text => {
+                        throw new Error('Unexpected response');
+                    });
+                }
+            })
+            .catch(error => {
+                // Show error toast
+                const errorToast = new bootstrap.Toast(document.getElementById('avatarErrorToast'));
+                document.getElementById('avatarErrorToastBody').textContent = 
+                    'Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại!';
+                errorToast.show();
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitText.innerHTML = '<i class="bi bi-send me-2"></i>Gửi yêu cầu duyệt';
+                submitSpinner.classList.add('d-none');
+            });
+        });
+    }
+    
+    // Handle collapse toggle for update requests section
+    const updateRequestsCollapse = document.getElementById('updateRequestsCollapse');
+    const updateRequestsChevron = document.getElementById('updateRequestsChevron');
+    
+    if (updateRequestsCollapse && updateRequestsChevron) {
+        updateRequestsCollapse.addEventListener('show.bs.collapse', function() {
+            updateRequestsChevron.classList.remove('bi-chevron-up');
+            updateRequestsChevron.classList.add('bi-chevron-down');
+        });
+        
+        updateRequestsCollapse.addEventListener('hide.bs.collapse', function() {
+            updateRequestsChevron.classList.remove('bi-chevron-down');
+            updateRequestsChevron.classList.add('bi-chevron-up');
+        });
+    }
+</script>
+<meta th:name="${_csrf.parameterName}" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+</body>
+</html>
+

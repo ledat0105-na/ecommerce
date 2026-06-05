@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${user.id == null ? 'Thêm người dùng mới' : 'Chỉnh sửa người dùng'}">Quản lý người dùng - Admin</title>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+	/* Cố định navbar - Độ ưu tiên cao nhất */
+	body nav.navbar,
+	body .navbar,
+	nav.navbar {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 100% !important;
+		z-index: 9999 !important;
+		margin: 0 !important;
+	}
+	body.bg-light {
+		padding-top: 76px !important;
+	}
+</style>
+</head>
+<body class="bg-light">
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">Website Bán Hàng Online - Admin</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin}">Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/products}">Sản phẩm</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/orders}">Đơn hàng</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/users}">Người dùng</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<span class="navbar-text me-3">Admin: <strong th:text="${#authentication.name}"></strong></span>
+					</li>
+					<li class="nav-item">
+						<form th:action="@{/auth/logout}" method="post" class="d-inline">
+							<button type="submit" class="btn btn-link nav-link text-white p-0 border-0">Đăng xuất</button>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container py-4">
+		<div class="row justify-content-center">
+			<div class="col-lg-8">
+				<!-- Breadcrumb -->
+				<nav aria-label="breadcrumb" class="mb-4">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+						<li class="breadcrumb-item"><a th:href="@{/admin/users}">Người dùng</a></li>
+						<li class="breadcrumb-item active" th:text="${user.id == null ? 'Thêm mới' : 'Chỉnh sửa'}">Thêm mới</li>
+					</ol>
+				</nav>
+
+				<div class="card">
+					<div class="card-header">
+						<h4 class="card-title mb-0">
+							<i class="bi bi-person me-2"></i>
+							<span th:text="${user.id == null ? 'Thêm người dùng mới' : 'Chỉnh sửa người dùng'}">Thêm người dùng mới</span>
+						</h4>
+					</div>
+					<div class="card-body">
+						<form th:action="@{/admin/users}" th:object="${user}" method="post">
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label for="username" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+									<input type="text" class="form-control" id="username" th:field="*{username}" required>
+								</div>
+								
+								<div class="col-md-6">
+									<label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+									<input type="email" class="form-control" id="email" th:field="*{email}" required>
+								</div>
+								
+								<div class="col-md-6" th:if="${user.id == null}">
+									<label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+									<input type="password" class="form-control" id="password" name="password" required>
+								</div>
+								
+								<div class="col-md-6">
+									<label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
+									<select class="form-select" id="role" th:field="*{role}" required>
+										<option value="ROLE_USER">User</option>
+										<option value="ROLE_ADMIN">Admin</option>
+									</select>
+								</div>
+								
+								<div class="col-md-6">
+									<label class="form-label">Trạng thái</label>
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" id="enabled" th:field="*{enabled}">
+										<label class="form-check-label" for="enabled">
+											Tài khoản hoạt động
+										</label>
+									</div>
+								</div>
+							</div>
+							
+							<div class="d-flex justify-content-between mt-4">
+								<a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+									<i class="bi bi-arrow-left me-2"></i>Quay lại
+								</a>
+								<button type="submit" class="btn btn-primary">
+									<i class="bi bi-check-circle me-2"></i>
+									<span th:text="${user.id == null ? 'Thêm người dùng' : 'Cập nhật người dùng'}">Thêm người dùng</span>
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

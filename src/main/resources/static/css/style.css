@@ -1,0 +1,1746 @@
+/* Custom CSS cho website ecommerce - Tương thích với Bootstrap */
+
+/* Professional Background Gradient */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding-top: 76px; /* Chiều cao của navbar */
+    /* Prevent scroll jank */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto; /* Disable smooth scroll to prevent jank */
+    overflow-anchor: none; /* Prevent scroll anchoring issues */
+    /* Optimize rendering */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* Sticky Navbar - Giữ navbar cố định ở đầu trang - Áp dụng cho tất cả navbar */
+.navbar,
+nav.navbar,
+.navbar.navbar-expand-lg,
+.navbar.navbar-dark,
+nav[class*="navbar"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1030 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    /* Optimize for scroll performance */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    will-change: auto !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    contain: layout style !important; /* Removed 'paint' to allow dropdown to show */
+    /* Đảm bảo navbar luôn ở trên cùng, không bị ảnh hưởng bởi scroll */
+    isolation: isolate !important;
+    /* Đảm bảo navbar không bị di chuyển khi scroll */
+    overflow: visible !important;
+}
+
+/* Ensure dropdown menu appears above navbar and other elements */
+.navbar .dropdown-menu {
+    z-index: 1040 !important;
+    position: absolute !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* Ensure dropdown is visible when shown */
+.navbar .dropdown-menu.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.navbar .dropdown {
+    position: relative;
+    z-index: 1040;
+}
+
+/* Ensure navbar nav items don't clip dropdown */
+.navbar-nav {
+    overflow: visible !important;
+}
+
+.navbar .nav-item {
+    overflow: visible !important;
+}
+
+/* Đảm bảo các container chính không bị che bởi navbar */
+.container {
+    position: relative;
+    z-index: 1;
+    /* Optimize for scroll performance */
+    contain: layout style;
+}
+
+/* Điều chỉnh cho các trang không có hero section */
+.page-content {
+    margin-top: 20px;
+}
+
+/* Floating Cart Button - Giỏ hàng nổi ở góc phải - Cố định khi scroll */
+.floating-cart,
+a.floating-cart {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 1040 !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50px !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    /* Đảm bảo luôn hiển thị khi scroll - không bị ẩn */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    will-change: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    /* Đảm bảo không bị ảnh hưởng bởi scroll hoặc transform của parent */
+    contain: layout style paint !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    /* Đảm bảo luôn ở trên cùng và không bị ảnh hưởng bởi parent transforms */
+    isolation: isolate !important;
+}
+
+.floating-cart:hover {
+    transform: translateZ(0) translateY(-3px) !important;
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.floating-cart .cart-count {
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Animation cho floating cart */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.floating-cart.bounce {
+    animation: bounce 1s;
+}
+
+/* Animation nhấp nháy cho notification badge */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+.notification-badge-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+}
+
+/* Toast notification styles */
+.toast-container {
+    max-width: 400px;
+}
+
+.toast-header.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+
+/* Override Bootstrap styles nếu cần */
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+}
+
+/* Custom styles cho các component đặc biệt */
+.stat-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border: none;
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+}
+
+.stat-card.warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #fd7e14 100%);
+}
+
+.stat-card.danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #e83e8c 100%);
+}
+
+.stat-card.info {
+    background: linear-gradient(135deg, var(--info-color) 0%, #6f42c1 100%);
+}
+
+.welcome-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: #ffffff !important;
+}
+
+.welcome-section h2 {
+    color: #ffffff !important;
+}
+
+.chart-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.quick-actions {
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Custom button styles */
+.btn-custom-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    color: white;
+    transition: transform 0.2s;
+}
+
+.btn-custom-primary:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    color: white;
+}
+
+/* Custom card hover effects */
+.card-hover {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* Custom navbar brand */
+.navbar-brand {
+    font-weight: 300;
+    font-size: 1.5rem;
+}
+
+/* Custom form styles */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Custom alert styles */
+.alert-custom {
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Custom pagination */
+.pagination .page-link {
+    color: var(--primary-color);
+    border-color: #dee2e6;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Custom text colors */
+.text-primary-custom {
+    color: var(--primary-color) !important;
+}
+
+/* Custom spacing utilities */
+.mb-custom {
+    margin-bottom: 3rem;
+}
+
+/* Custom shadow utilities */
+.shadow-custom {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .welcome-section {
+        padding: 1.5rem !important;
+    }
+    
+    .welcome-section h2 {
+        color: #ffffff !important;
+    }
+    
+    .welcome-section p {
+        font-size: 1rem;
+        color: #ffffff !important;
+    }
+}
+
+/* Hero Section Styles */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    margin-top: 76px; /* Thêm margin-top để tránh bị che bởi navbar */
+    contain: layout style paint;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,0 1000,100 0,80"/></svg>') no-repeat bottom;
+    background-size: cover;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Feature Icons */
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Product Cards - Optimized for performance */
+.product-card {
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    border: none;
+    overflow: hidden;
+    /* Only use will-change on hover, not always */
+    will-change: auto;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    isolation: isolate;
+    touch-action: manipulation;
+    contain: layout style paint;
+    content-visibility: auto;
+}
+
+.product-card:hover {
+    transform: translateY(-4px) translateZ(0);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    will-change: transform;
+}
+
+.product-card:active {
+    transform: translateY(-2px) translateZ(0);
+}
+
+.product-card a {
+    pointer-events: auto;
+    text-decoration: none;
+}
+
+.product-card img {
+    transition: transform 0.15s ease-out;
+    will-change: auto;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    /* Prevent image reflow */
+    contain: layout style paint;
+}
+
+.product-card:hover img {
+    transform: scale(1.01) translateZ(0);
+    will-change: transform;
+}
+
+/* Disable hover effects on touch devices to reduce lag */
+@media (hover: none) {
+    .product-card:hover {
+        transform: translateZ(0);
+        box-shadow: none;
+    }
+    .product-card:hover img {
+        transform: translateZ(0);
+    }
+}
+
+/* Contact Section */
+.contact-icon {
+    transition: all 0.3s ease;
+}
+
+.contact-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Custom Button Styles */
+.btn-hero {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Section Spacing */
+.section-padding {
+    padding: 80px 0;
+    /* Optimize for scroll performance */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    contain: layout style paint;
+}
+
+/* Animation utilities */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.bounce-in {
+    animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Top Product Badges - Optimized (no animation to reduce lag) */
+.badge-top-1 {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+    color: #000 !important;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    animation: none !important; /* Remove animation to reduce lag */
+}
+
+.badge-top-2 {
+    background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%) !important;
+    color: #000 !important;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4);
+    animation: none !important; /* Remove animation to reduce lag */
+}
+
+.badge-top-3 {
+    background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%) !important;
+    color: #fff !important;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
+    animation: none !important; /* Remove animation to reduce lag */
+}
+
+/* Top Products Section */
+.top-products-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    contain: layout style paint;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* Product Card Enhancements - Removed pulse animation to reduce lag */
+.product-card .badge {
+    z-index: 10;
+    animation: none !important; /* Remove animation to reduce lag */
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive adjustments for top products */
+@media (max-width: 768px) {
+    .top-products-section {
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .badge {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+}
+
+/* Category Filter Pills */
+.category-pill {
+    transition: all 0.3s ease;
+    border-radius: 25px;
+    font-weight: 500;
+}
+
+.category-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.category-pill.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Product Category Badge */
+.product-category-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* Enhanced Search Form */
+.search-form {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive Hero */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem;
+    }
+    
+    .hero-section .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .category-pill {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    /* Floating cart responsive */
+    .floating-cart,
+    a.floating-cart {
+        bottom: 20px !important;
+        right: 20px !important;
+        padding: 12px 16px !important;
+        font-size: 13px !important;
+    }
+}
+
+/* Modal Styles - Đảm bảo modal hoạt động đúng cách và KHÔNG BỊ MỜ */
+.modal {
+    z-index: 1055 !important;
+    opacity: 1 !important;
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    visibility: hidden !important;
+}
+
+.modal.show,
+.modal:not(.fade) {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Override Bootstrap fade - Đảm bảo modal KHÔNG BỊ MỜ */
+.modal.fade {
+    opacity: 1 !important;
+    transition: none !important;
+}
+
+.modal.fade.show {
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.modal.fade:not(.show) {
+    opacity: 0;
+    display: none;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+    background-color: rgba(0, 0, 0, 0.3) !important; /* Giảm độ tối từ 0.5 xuống 0.3 */
+    pointer-events: none !important; /* QUAN TRỌNG: Không chặn click events */
+}
+
+.modal-backdrop.show {
+    opacity: 0.3 !important; /* Giảm độ tối từ 0.5 xuống 0.3 */
+    pointer-events: none !important; /* QUAN TRỌNG: Không chặn click events */
+}
+
+/* Đảm bảo modal dialog và content có thể tương tác và KHÔNG BỊ MỜ */
+/* QUAN TRỌNG: Luôn dùng fixed positioning để modal luôn ở giữa VIEWPORT, không phải document */
+.modal-dialog {
+    z-index: 1056 !important;
+    position: fixed !important;
+    top: 50vh !important; /* Dùng viewport height thay vì % */
+    left: 50vw !important; /* Dùng viewport width thay vì % */
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    pointer-events: auto !important; /* QUAN TRỌNG: Cho phép tương tác */
+    filter: none !important; /* Không có filter làm tối */
+    mix-blend-mode: normal !important;
+    max-width: 500px !important;
+    width: 90% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    display: block !important;
+    visibility: visible !important;
+    /* Đảm bảo modal luôn ở giữa viewport bất kể scroll position */
+    will-change: transform;
+}
+
+/* Đảm bảo modal dialog hiển thị khi modal show */
+/* QUAN TRỌNG: Luôn dùng viewport units để đảm bảo modal ở giữa màn hình hiện tại */
+.modal.show .modal-dialog,
+.modal:not(.fade) .modal-dialog {
+    position: fixed !important;
+    top: 50vh !important; /* Viewport height - luôn ở giữa màn hình hiện tại */
+    left: 50vw !important; /* Viewport width - luôn ở giữa màn hình hiện tại */
+    transform: translate(-50%, -50%) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Đảm bảo không bị ảnh hưởng bởi scroll position */
+    margin: 0 !important;
+}
+
+.modal-content {
+    z-index: 1057 !important;
+    position: relative;
+    pointer-events: auto !important; /* QUAN TRỌNG: Cho phép tương tác */
+    opacity: 1 !important;
+    background-color: #ffffff !important; /* Màu trắng sáng 100% */
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important; /* Shadow sáng hơn và thêm highlight */
+    /* Đảm bảo modal content luôn có thể tương tác và SÁNG */
+    touch-action: auto !important;
+    -webkit-touch-callout: default !important;
+    filter: none !important; /* Không có filter làm tối */
+    /* Đảm bảo modal sáng 100% */
+    mix-blend-mode: normal !important;
+    isolation: isolate !important; /* Tách biệt với backdrop */
+}
+
+/* Override tất cả fade transitions */
+/* QUAN TRỌNG: Đảm bảo tất cả modal-dialog đều dùng viewport center */
+.modal.fade .modal-dialog,
+.modal:not(.fade) .modal-dialog {
+    transition: none !important;
+    transform: translate(-50%, -50%) !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    top: 50vh !important; /* Viewport height */
+    left: 50vw !important; /* Viewport width */
+    display: block !important;
+    visibility: visible !important;
+    margin: 0 !important;
+}
+
+/* Đảm bảo modal-dialog-centered cũng hoạt động đúng */
+.modal-dialog-centered {
+    position: fixed !important;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+}
+
+.modal.show .modal-dialog-centered,
+.modal:not(.fade) .modal-dialog-centered {
+    position: fixed !important;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+}
+
+/* Đảm bảo tất cả các element trong modal có thể tương tác và SÁNG RÕ */
+.modal-content * {
+    pointer-events: auto !important;
+    position: relative;
+    opacity: 1 !important;
+    filter: none !important; /* Không có filter làm tối */
+}
+
+/* Đảm bảo text trong modal sáng rõ */
+.modal-content p,
+.modal-content h5,
+.modal-content label,
+.modal-content span,
+.modal-content strong {
+    color: #212529 !important; /* Màu đen sáng */
+    opacity: 1 !important;
+}
+
+.modal-header {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    background-color: #0d6efd !important; /* Màu xanh sáng cho header */
+    filter: none !important;
+}
+
+.modal-body {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    background-color: #ffffff !important; /* Màu trắng sáng 100% */
+    color: #212529 !important; /* Màu text đen sáng */
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    /* Đảm bảo body sáng rõ */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5) inset !important;
+}
+
+.modal-footer {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    background-color: #ffffff !important; /* Màu trắng sáng */
+    filter: none !important;
+}
+
+/* Đảm bảo button và select có thể click được - Z-INDEX RẤT CAO và SÁNG */
+.modal button,
+.modal select,
+.modal input,
+.modal .form-select,
+.modal .form-control {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 10000 !important; /* Z-index rất cao để đảm bảo trên cùng */
+    opacity: 1 !important;
+    touch-action: auto !important;
+    filter: none !important; /* Không có filter làm tối */
+    background-color: #fff !important; /* Background trắng cho select */
+    color: #212529 !important; /* Màu text đen sáng */
+}
+
+/* Đảm bảo select dropdown có thể mở được */
+.modal .form-select {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 10001 !important; /* Z-index cao nhất cho select */
+    touch-action: auto !important;
+}
+
+.modal .form-select:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    z-index: 10002 !important; /* Z-index cao nhất khi focus */
+}
+
+/* Đảm bảo modal dialog và content có z-index rất cao và SÁNG */
+/* QUAN TRỌNG: Override tất cả các trường hợp để modal luôn ở giữa viewport */
+.modal.show .modal-dialog,
+.modal.show .modal-dialog-centered,
+.modal[style*="display: block"] .modal-dialog,
+.modal[style*="display: block"] .modal-dialog-centered {
+    position: fixed !important;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+}
+
+.modal.show .modal-dialog {
+    z-index: 9998 !important;
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    position: fixed !important;
+    top: 50vh !important; /* Viewport height - luôn ở giữa màn hình hiện tại */
+    left: 50vw !important; /* Viewport width - luôn ở giữa màn hình hiện tại */
+    transform: translate(-50%, -50%) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.modal.show .modal-content {
+    z-index: 9999 !important;
+    background-color: #ffffff !important; /* Đảm bảo trắng sáng 100% */
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    isolation: isolate !important; /* Tách biệt hoàn toàn với backdrop */
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+}
+
+/* Khi modal hiển thị, hạ z-index của floating cart để không che modal */
+body.modal-open .floating-cart {
+    z-index: 1039 !important;
+}
+
+/* ============================================
+   PROFESSIONAL STYLING - Based on success page
+   ============================================ */
+
+/* Professional Cards */
+.professional-card,
+.success-card,
+.info-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: white;
+    animation: slideDown 0.5s ease-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.professional-card:hover,
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card Headers */
+.card-header {
+    border: none;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+}
+
+.card-header.bg-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+.card-header.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+}
+
+.card-header.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%) !important;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Detail Items */
+.detail-item {
+    padding: 0.75rem 0;
+}
+
+.detail-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    color: #212529;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Professional Tables */
+.professional-table,
+.order-table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.professional-table thead,
+.order-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.professional-table thead th,
+.order-table thead th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.professional-table tbody tr,
+.order-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.professional-table tbody tr:hover,
+.order-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.professional-table tbody td,
+.order-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+.professional-table tfoot,
+.order-table tfoot {
+    background-color: #f8f9fa;
+}
+
+.professional-table tfoot td,
+.order-table tfoot td {
+    padding: 1.25rem 1rem;
+    font-weight: 600;
+}
+
+/* Professional Buttons */
+.btn-professional,
+.btn-action {
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-professional:hover,
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a91 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Badges */
+.badge-status {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: 20px;
+}
+
+/* Gradient Text */
+.gradient-text,
+.order-code {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.success-title {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+/* Icons */
+.success-icon {
+    animation: scaleIn 0.6s ease-out;
+    color: #28a745 !important;
+    filter: drop-shadow(0 4px 8px rgba(40, 167, 69, 0.3));
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Product Images */
+.product-img {
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.product-img:hover {
+    transform: scale(1.05);
+}
+
+/* Alerts */
+.countdown-alert {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(13, 110, 253, 0.3);
+    }
+}
+
+/* Total Amount */
+.total-amount {
+    color: #28a745;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Smooth Scroll - Only for anchor links, not for regular scrolling */
+html {
+    scroll-behavior: auto; /* Disable smooth scroll to prevent jank */
+}
+
+/* Only apply smooth scroll to anchor links */
+html:has(a[href^="#"]:target) {
+    scroll-behavior: smooth;
+}
+
+/* Alternative: Use smooth scroll only when explicitly requested */
+a[href^="#"] {
+    scroll-behavior: smooth;
+}
+
+/* Footer */
+footer {
+    margin-top: 3rem;
+    border-top: 3px solid #667eea;
+    background: #212529 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .order-code {
+        font-size: 1.5rem;
+    }
+    
+    .success-icon {
+        font-size: 4rem !important;
+    }
+    
+    .detail-item {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-action,
+    .btn-professional {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    .professional-card,
+    .success-card,
+    .info-card {
+        border-radius: 15px;
+    }
+}
+
+/* ============================================
+   ADMIN THEME - Luxury & Professional Design
+   Màu sắc sang trọng: Navy Blue -> Teal -> Emerald
+   ============================================ */
+
+/* Admin Body Background - Luxury Gradient */
+body.admin-theme,
+body.admin-theme.bg-light {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
+    min-height: 100vh;
+    padding-top: 76px !important; /* Space for fixed navbar */
+    margin-top: 0 !important;
+}
+
+/* Admin Navbar - Luxury Gradient - Fixed at top */
+body.admin-theme .navbar,
+body.admin-theme .navbar.admin-navbar,
+.navbar.admin-navbar,
+body.admin-theme nav.navbar,
+nav.navbar.admin-navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1050 !important;
+    width: 100% !important;
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #3b82f6 100%) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3) !important;
+    /* Ensure navbar stays on top and doesn't scroll */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    will-change: auto !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    /* Prevent any scrolling behavior */
+    margin: 0 !important;
+}
+
+body.admin-theme .navbar-brand,
+.navbar.admin-navbar .navbar-brand {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: #ffffff !important;
+}
+
+body.admin-theme .navbar-nav .nav-link,
+.navbar.admin-navbar .nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    margin: 0 0.25rem;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.admin-theme .navbar-nav .nav-link:hover,
+.navbar.admin-navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff !important;
+    transform: translateY(-2px);
+}
+
+body.admin-theme .navbar-nav .nav-link.active,
+.navbar.admin-navbar .nav-link.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(16, 185, 129, 0.3) 100%);
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Ensure dropdown menus appear above fixed navbar */
+body.admin-theme .navbar .dropdown-menu,
+.navbar.admin-navbar .dropdown-menu {
+    z-index: 1060 !important;
+    position: absolute !important;
+    margin-top: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+body.admin-theme .navbar .dropdown,
+.navbar.admin-navbar .dropdown {
+    position: relative;
+    z-index: 1060;
+}
+
+/* Ensure navbar nav items don't clip dropdown */
+body.admin-theme .navbar-nav,
+.navbar.admin-navbar .navbar-nav {
+    overflow: visible !important;
+}
+
+body.admin-theme .navbar .nav-item,
+.navbar.admin-navbar .nav-item {
+    overflow: visible !important;
+}
+
+/* Admin Cards - Luxury Design - No Hover Effects */
+.admin-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+/* Admin Card Headers - Luxury Gradients - Elegant Purple & Gold */
+body.admin-theme .card-header.bg-primary,
+.admin-card .card-header.bg-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%) !important;
+    color: white;
+    border: none;
+    padding: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+body.admin-theme .card-header.bg-info,
+.admin-card .card-header.bg-info {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%) !important;
+    color: white;
+}
+
+body.admin-theme .card-header.bg-success,
+.admin-card .card-header.bg-success {
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%) !important;
+    color: white;
+}
+
+body.admin-theme .card-header.bg-warning,
+.admin-card .card-header.bg-warning {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%) !important;
+    color: #1f2937;
+}
+
+body.admin-theme .card-header.bg-danger,
+.admin-card .card-header.bg-danger {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%) !important;
+    color: white;
+}
+
+/* Admin Tables - Luxury Design */
+body.admin-theme .professional-table thead,
+.admin-card .professional-table thead {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+body.admin-theme .professional-table thead th,
+.admin-card .professional-table thead th {
+    border: none;
+    padding: 1.25rem 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body.admin-theme .professional-table tbody tr,
+.admin-card .professional-table tbody tr {
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+body.admin-theme .professional-table tbody tr:hover,
+.admin-card .professional-table tbody tr:hover {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+/* Admin Buttons - Luxury Design - No Hover Transform */
+body.admin-theme .btn-primary,
+.admin-card .btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    letter-spacing: 0.5px;
+}
+
+body.admin-theme .btn-primary:hover,
+.admin-card .btn-primary:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    color: white;
+}
+
+body.admin-theme .btn-outline-primary {
+    border: 2px solid #8b5cf6;
+    color: #8b5cf6;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+}
+
+body.admin-theme .btn-outline-primary:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+}
+
+body.admin-theme .btn-outline-warning {
+    border: 2px solid #f59e0b;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+body.admin-theme .btn-outline-warning:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    border-color: transparent;
+    color: #1f2937;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+}
+
+body.admin-theme .btn-outline-success {
+    border: 2px solid #10b981;
+    color: #10b981;
+    font-weight: 600;
+}
+
+body.admin-theme .btn-outline-success:hover {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+body.admin-theme .btn-outline-danger {
+    border: 2px solid #ef4444;
+    color: #ef4444;
+    font-weight: 600;
+}
+
+body.admin-theme .btn-outline-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+}
+
+body.admin-theme .btn-outline-info {
+    border: 2px solid #06b6d4;
+    color: #06b6d4;
+    font-weight: 600;
+}
+
+body.admin-theme .btn-outline-info:hover {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+}
+
+/* Admin Form Styling */
+body.admin-theme .form-control:focus,
+body.admin-theme .form-select:focus,
+.admin-card .form-control:focus,
+.admin-card .form-select:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25), 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+/* Admin Search Form */
+body.admin-theme .search-form,
+.admin-card .search-form {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(59, 130, 246, 0.1) inset;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Admin Pagination */
+body.admin-theme .pagination .page-link,
+.admin-card .pagination .page-link {
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+    border-radius: 10px;
+    margin: 0 3px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+body.admin-theme .pagination .page-link:hover,
+.admin-card .pagination .page-link:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+body.admin-theme .pagination .page-item.active .page-link,
+.admin-card .pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Admin Badges */
+body.admin-theme .badge-status,
+.admin-card .badge-status {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+}
+
+body.admin-theme .badge.bg-primary,
+.admin-card .badge.bg-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+}
+
+body.admin-theme .badge.bg-success,
+.admin-card .badge.bg-success {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
+}
+
+body.admin-theme .badge.bg-danger,
+.admin-card .badge.bg-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+}
+
+body.admin-theme .badge.bg-warning,
+.admin-card .badge.bg-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
+    color: #1f2937;
+}
+
+body.admin-theme .badge.bg-info,
+.admin-card .badge.bg-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%) !important;
+}
+
+body.admin-theme .badge.bg-secondary,
+.admin-card .badge.bg-secondary {
+    background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%) !important;
+}
+
+/* Admin Headings */
+body.admin-theme h3,
+body.admin-theme h4,
+body.admin-theme h5 {
+    color: #1e293b;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+body.admin-theme h2,
+body.admin-theme .page-title {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 2rem;
+}
+
+/* Admin Alerts */
+body.admin-theme .alert-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 2px solid #10b981;
+    border-radius: 15px;
+    color: #065f46;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+}
+
+body.admin-theme .alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    border-radius: 15px;
+    color: #991b1b;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+}
+
+body.admin-theme .alert-info {
+    background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+    border: 2px solid #06b6d4;
+    border-radius: 15px;
+    color: #0e7490;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+}
+
+body.admin-theme .alert-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 15px;
+    color: #92400e;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+}
+
+/* Admin Container */
+body.admin-theme .container-fluid {
+    background: transparent;
+}
+
+/* Admin Page Title */
+body.admin-theme .page-title {
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Admin Stats Cards - Elegant Purple & Gold - No Hover Effects */
+body.admin-theme .stat-card {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Clickable Stat Cards - No Hover Transform */
+body.admin-theme .clickable-stat-card {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+body.admin-theme .clickable-stat-card:hover {
+    box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+}
+
+body.admin-theme .clickable-stat-card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+body.admin-theme .stat-card.success {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
+}
+
+body.admin-theme .stat-card.info {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+}
+
+body.admin-theme .stat-card.warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fcd34d 100%);
+    color: #1f2937;
+}
+
+body.admin-theme .stat-card.warning .text-white-50 {
+    color: rgba(31, 41, 55, 0.7) !important;
+}
+
+body.admin-theme .stat-card.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #f87171 50%, #fca5a5 100%);
+}
+
+/* Admin Sidebar Sticky */
+body.admin-theme .sticky-top {
+    position: sticky;
+    top: 100px;
+    z-index: 1020;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+body.admin-theme .sticky-top::-webkit-scrollbar {
+    width: 6px;
+}
+
+body.admin-theme .sticky-top::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+body.admin-theme .sticky-top::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 10px;
+}
+
+body.admin-theme .sticky-top::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+/* Admin Welcome Section */
+body.admin-theme .welcome-section {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    color: #ffffff !important;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
+}
+
+body.admin-theme .welcome-section,
+body.admin-theme .welcome-section * {
+    color: #ffffff !important;
+}
+
+body.admin-theme .welcome-section h2 {
+    color: #ffffff !important;
+}
+
+/* Admin Empty State */
+body.admin-theme .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+body.admin-theme .empty-state i {
+    font-size: 4rem;
+    color: rgba(59, 130, 246, 0.5);
+    margin-bottom: 1rem;
+}
+
+/* Responsive Admin Theme */
+@media (max-width: 768px) {
+    body.admin-theme .admin-card {
+        border-radius: 15px;
+        margin-bottom: 1rem;
+    }
+    
+    body.admin-theme .card-header {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    body.admin-theme .professional-table thead th {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    body.admin-theme .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    body.admin-theme .welcome-section h2 {
+        color: #ffffff !important;
+    }
+}

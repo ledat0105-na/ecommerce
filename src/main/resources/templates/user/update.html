@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gửi yêu cầu cập nhật</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Gửi yêu cầu cập nhật</h5>
+        </div>
+        <div class="card-body">
+          <form id="updateRequestForm" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label">Họ và tên mới</label>
+              <input class="form-control" type="text" name="fullName" placeholder="Nhập họ tên mới">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Số điện thoại mới</label>
+              <input class="form-control" type="text" name="phone" placeholder="Nhập số điện thoại mới">
+            </div>
+            
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="province" class="form-label">Tỉnh/Thành phố</label>
+                <select id="province" class="form-select address-select" name="province">
+                  <option value="">-- Chọn tỉnh/thành phố --</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="district" class="form-label">Quận/Huyện</label>
+                <select id="district" class="form-select address-select" name="district" disabled>
+                  <option value="">-- Chọn quận/huyện --</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="ward" class="form-label">Phường/Xã</label>
+                <select id="ward" class="form-select address-select" name="ward" disabled>
+                  <option value="">-- Chọn phường/xã --</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Địa chỉ chi tiết</label>
+              <textarea class="form-control" name="address" rows="2" placeholder="Số nhà, tên đường..."></textarea>
+            </div>
+            
+            <!-- Hidden fields để gửi tên đầy đủ -->
+            <input type="hidden" id="provinceName" name="provinceName">
+            <input type="hidden" id="districtName" name="districtName">
+            <input type="hidden" id="wardName" name="wardName">
+            <div class="mb-3">
+              <label class="form-label">Ảnh đại diện mới</label>
+              <input class="form-control" type="file" name="avatar" accept="image/*">
+              <div class="form-text">Tối đa 3MB. Định dạng: JPG, PNG, GIF.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Cập nhật file upload (CV)</label>
+              <input class="form-control" type="file" name="cv" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+              <div class="form-text">Tối đa 5MB. PDF/DOC/DOCX.</div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+              <a th:href="@{/profile}" class="btn btn-secondary">Hủy</a>
+              <button type="submit" id="submitBtn" class="btn btn-primary">
+                <span id="submitText">Gửi yêu cầu</span>
+                <span id="submitSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              </button>
+            </div>
+          </form>
+          
+          <!-- Toast Container -->
+          <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+            <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+              <div class="toast-header bg-success text-white">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong class="me-auto">Thành công</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body" id="successToastBody"></div>
+            </div>
+            <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+              <div class="toast-header bg-danger text-white">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <strong class="me-auto">Lỗi</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body" id="errorToastBody"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Address API JS -->
+<script th:src="@{/js/address-api.js}"></script>
+<script>
+    // Set placeholder data attributes before initialization
+    $(document).ready(function() {
+        $('#province').data('placeholder', '-- Chọn tỉnh/thành phố --');
+        $('#district').data('placeholder', '-- Chọn quận/huyện --');
+        $('#ward').data('placeholder', '-- Chọn phường/xã --');
+        
+        // Initialize address selects
+        // Select2 will be initialized automatically when options are populated
+        initAddressSelects({
+            provinceSelectId: 'province',
+            districtSelectId: 'district',
+            wardSelectId: 'ward'
+        });
+    });
+
+    // Update hidden fields with selected names
+    $(document).ready(function() {
+        const provinceNameField = document.getElementById('provinceName');
+        const districtNameField = document.getElementById('districtName');
+        const wardNameField = document.getElementById('wardName');
+
+        function updateProvinceField() {
+            const selectedOption = $('#province option:selected');
+            if (selectedOption.length && selectedOption.val()) {
+                const provinceName = selectedOption.text();
+                if (provinceNameField) {
+                    provinceNameField.value = provinceName;
+                }
+            }
+        }
+
+        function updateDistrictField() {
+            const selectedOption = $('#district option:selected');
+            if (selectedOption.length && selectedOption.val()) {
+                const districtName = selectedOption.text();
+                if (districtNameField) {
+                    districtNameField.value = districtName;
+                }
+            }
+        }
+
+        function updateWardField() {
+            const selectedOption = $('#ward option:selected');
+            if (selectedOption.length && selectedOption.val()) {
+                const wardName = selectedOption.text();
+                if (wardNameField) {
+                    wardNameField.value = wardName;
+                }
+            }
+        }
+
+        // Handle change events với Select2
+        $('#province').on('change', function() {
+            updateProvinceField();
+        });
+
+        $('#district').on('change', function() {
+            updateDistrictField();
+        });
+
+        $('#ward').on('change', function() {
+            updateWardField();
+        });
+        
+        // Also update fields on form submit to ensure values are set
+        const form = document.getElementById('updateRequestForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateProvinceField();
+                updateDistrictField();
+                updateWardField();
+                
+                const submitBtn = document.getElementById('submitBtn');
+                const submitText = document.getElementById('submitText');
+                const submitSpinner = document.getElementById('submitSpinner');
+                
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitText.textContent = 'Đang gửi...';
+                submitSpinner.classList.remove('d-none');
+                
+                // Create FormData
+                const formData = new FormData(form);
+                
+                // Get CSRF token and add to form data (required for multipart/form-data)
+                const csrfTokenMeta = document.querySelector('meta[name="_csrf"]') || document.querySelector('meta[th\\:name*="_csrf"]');
+                const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]') || document.querySelector('meta[th\\:name*="_csrf_header"]');
+                
+                const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') || csrfTokenMeta.getAttribute('th:content') : '';
+                const csrfParameterName = csrfHeaderMeta ? csrfHeaderMeta.getAttribute('content') || csrfHeaderMeta.getAttribute('th:content') : '_csrf';
+                
+                // Add CSRF token to form data (Spring Security expects it in form data for multipart)
+                if (csrfToken) {
+                    formData.append('_csrf', csrfToken);
+                }
+                
+                // Send AJAX request
+                fetch('/profile/request-update-ajax', {
+                    method: 'POST',
+                    body: formData
+                    // Note: Don't set Content-Type header - browser will set it with boundary for multipart/form-data
+                })
+                .then(response => {
+                    // Check if response is ok
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                throw new Error('Server error: ' + response.status + ' ' + response.statusText);
+                            }
+                        });
+                    }
+                    // Check content type before parsing JSON
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        return response.text().then(text => {
+                            console.error('Unexpected response type:', contentType, text);
+                            throw new Error('Server trả về dữ liệu không hợp lệ. Vui lòng thử lại!');
+                        });
+                    }
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        // Show success toast
+                        const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+                        document.getElementById('successToastBody').textContent = data.message || 'Đã gửi yêu cầu cập nhật thành công!';
+                        successToast.show();
+                        
+                        // Reset form after 2 seconds
+                        setTimeout(() => {
+                            form.reset();
+                            window.location.href = '/profile';
+                        }, 2000);
+                    } else {
+                        // Show error toast
+                        const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                        document.getElementById('errorToastBody').textContent = data?.message || 'Có lỗi xảy ra khi gửi yêu cầu cập nhật';
+                        errorToast.show();
+                        
+                        // Re-enable submit button
+                        submitBtn.disabled = false;
+                        submitText.textContent = 'Gửi yêu cầu';
+                        submitSpinner.classList.add('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error toast
+                    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    document.getElementById('errorToastBody').textContent = error.message || 'Có lỗi xảy ra. Vui lòng thử lại!';
+                    errorToast.show();
+                    
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitText.textContent = 'Gửi yêu cầu';
+                    submitSpinner.classList.add('d-none');
+                });
+            });
+        }
+    });
+</script>
+<meta th:name="${_csrf.parameterName}" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+</body>
+</html>
+
+

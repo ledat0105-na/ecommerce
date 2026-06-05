@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${product.id == null ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}">Quản lý sản phẩm - Admin</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+	/* Cố định navbar - Độ ưu tiên cao nhất */
+	body.admin-theme nav.navbar,
+	body.admin-theme .navbar.admin-navbar,
+	nav.navbar.admin-navbar {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 100% !important;
+		z-index: 9999 !important;
+		margin: 0 !important;
+	}
+</style>
+</head>
+<body class="bg-light admin-theme">
+	<nav class="navbar navbar-expand-lg navbar-dark admin-navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/admin}">Website Bán Hàng Online - Admin</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin}">Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" th:href="@{/admin/products}">Sản phẩm</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/orders}">Đơn hàng</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/users}">Người dùng</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<span class="navbar-text me-3">Admin: <strong th:text="${#authentication.name}"></strong></span>
+					</li>
+					<li class="nav-item">
+						<form th:action="@{/auth/logout}" method="post" class="d-inline">
+							<button type="submit" class="btn btn-link nav-link text-white p-0 border-0">Đăng xuất</button>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container py-4">
+		<div class="row justify-content-center">
+			<div class="col-lg-10">
+				<nav aria-label="breadcrumb" class="mb-4">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+						<li class="breadcrumb-item"><a th:href="@{/admin/products}">Sản phẩm</a></li>
+						<li class="breadcrumb-item active" th:text="${product.id == null ? 'Thêm mới' : 'Chỉnh sửa'}">Thêm mới</li>
+					</ol>
+				</nav>
+
+				<div class="card admin-card">
+					<div class="card-header bg-primary text-white">
+						<h4 class="card-title mb-0">
+							<i class="bi bi-box me-2"></i>
+							<span th:text="${product.id == null ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}">Thêm sản phẩm mới</span>
+						</h4>
+					</div>
+					<div class="card-body">
+						<!-- Success/Error Messages -->
+						<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+							<i class="bi bi-check-circle me-2"></i><span th:text="${successMessage}"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+						</div>
+						<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+							<i class="bi bi-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+						</div>
+						
+						<form th:action="@{/admin/products}" th:object="${product}" method="post" enctype="multipart/form-data" id="productForm">
+							<!-- Hidden field for product ID -->
+							<input type="hidden" th:field="*{id}">
+							
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+									<input type="text" class="form-control" id="name" th:field="*{name}" required>
+								</div>
+								
+								<div class="col-md-6">
+									<label for="category" class="form-label">Danh mục</label>
+									<select class="form-select" id="category" th:field="*{category}">
+										<option value="">Chọn danh mục</option>
+										<option value="Giày thể thao">Giày thể thao</option>
+										<option value="Giày chạy bộ">Giày chạy bộ</option>
+										<option value="Giày bóng đá">Giày bóng đá</option>
+										<option value="Giày bóng rổ">Giày bóng rổ</option>
+										<option value="Giày tennis">Giày tennis</option>
+										<option value="Giày casual">Giày casual</option>
+										<option value="Giày công sở">Giày công sở</option>
+										<option value="Giày sneaker">Giày sneaker</option>
+										<option value="Sandals">Sandals</option>
+										<option value="Giày boot">Giày boot</option>
+									</select>
+								</div>
+								
+								<div class="col-12">
+									<label for="description" class="form-label">Mô tả sản phẩm</label>
+									<textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+								</div>
+								
+								<div class="col-md-6">
+									<label for="price" class="form-label">Giá (VNĐ) <span class="text-danger">*</span></label>
+									<input type="number" class="form-control" id="price" th:field="*{price}" min="0" step="1000" required>
+								</div>
+								
+								<div class="col-md-6">
+									<label for="stock" class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
+									<input type="number" class="form-control" id="stock" th:field="*{stock}" min="0" required>
+								</div>
+								
+								<!-- Product Images Section -->
+								<div class="col-12">
+									<hr>
+									<label class="form-label fw-bold">Hình ảnh sản phẩm <span class="text-danger">*</span></label>
+									<div class="alert alert-info">
+										<i class="bi bi-info-circle me-2"></i>
+										Vui lòng cung cấp <strong>tối thiểu 2 ảnh, tối đa 5 ảnh</strong> cho sản phẩm. 
+										Bạn có thể upload ảnh hoặc nhập link URL.
+									</div>
+									
+									<!-- Image Upload/URL Inputs -->
+									<div id="imageInputs">
+										<!-- Dynamic inputs will be added here -->
+								</div>
+								
+									<button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addImageBtn">
+										<i class="bi bi-plus-circle me-1"></i>Thêm ảnh
+									</button>
+									<span class="ms-2" id="imageCount">Đã thêm: 0/5 ảnh</span>
+									<div id="imageCountError" class="text-danger mt-1" style="display: none;"></div>
+									
+									<!-- Preview Images (Existing + New) -->
+									<div class="row g-2 mt-3" id="imagePreviews">
+										<!-- Existing images for edit mode -->
+										<div th:each="image, iterStat : ${product.images}" class="col-md-3 col-6 image-preview-item" th:attr="data-image-id=${image.id}">
+											<div class="position-relative">
+												<img th:src="${(#strings.startsWith(image.imageUrl,'http://') or #strings.startsWith(image.imageUrl,'https://')) ? image.imageUrl : (#strings.startsWith(image.imageUrl,'/') ? image.imageUrl : '/' + #strings.trim(image.imageUrl))}"
+													 class="img-thumbnail w-100 product-form-image" 
+													 style="height: 150px; object-fit: cover;"
+													 onerror="this.src='https://via.placeholder.com/150x150/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'">
+												<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 remove-existing-image" 
+														th:attr="data-image-id=${image.id}"
+														title="Xóa ảnh này">
+													<i class="bi bi-x"></i>
+												</button>
+												<input type="hidden" name="existingImageUrls" th:value="${image.imageUrl}">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="d-flex justify-content-between mt-4">
+								<a th:href="@{/admin/products}" class="btn btn-outline-secondary">
+									<i class="bi bi-arrow-left me-2"></i>Quay lại
+								</a>
+								<button type="submit" class="btn btn-primary" id="submitBtn">
+									<i class="bi bi-check-circle me-2"></i>
+									<span th:text="${product.id == null ? 'Thêm sản phẩm' : 'Cập nhật sản phẩm'}">Thêm sản phẩm</span>
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<style>
+		.image-preview-item {
+			position: relative;
+		}
+		.image-input-group {
+			margin-bottom: 10px;
+			border: 1px solid #dee2e6;
+			border-radius: 5px;
+			padding: 10px;
+		}
+		.image-preview-container img {
+			max-width: 200px;
+			max-height: 150px;
+			object-fit: cover;
+		}
+	</style>
+	
+	<script>
+		(function() {
+			'use strict';
+			
+			const maxImages = 5;
+			const minImages = 2;
+			
+			// Count existing images on page load
+			let existingImageCount = document.querySelectorAll('input[name="existingImageUrls"]').length;
+			
+			// Debounce function to prevent too many updates
+			let updateTimeout = null;
+			function debounceUpdate(func, delay = 100) {
+				return function() {
+					clearTimeout(updateTimeout);
+					updateTimeout = setTimeout(func, delay);
+				};
+			}
+			
+			// Function to count all valid images
+			function countAllImages() {
+				let count = existingImageCount;
+				
+				// Count images from file inputs
+				const fileInputs = document.querySelectorAll('input[name="imageFiles"]');
+				fileInputs.forEach(input => {
+					if (input.files && input.files.length > 0) {
+						count++;
+					}
+				});
+				
+				// Count images from URL inputs (that don't have files)
+				const urlInputs = document.querySelectorAll('input[name="imageUrls"]');
+				urlInputs.forEach(input => {
+					const group = input.closest('.image-input-group');
+					if (group) {
+						const fileInput = group.querySelector('.image-file-input');
+						const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+						
+						if (input.value && input.value.trim() && !hasFile) {
+							count++;
+						}
+					}
+				});
+				
+				return count;
+			}
+			
+			// Update image count display
+			function updateImageCount() {
+				const count = countAllImages();
+				const countElement = document.getElementById('imageCount');
+				const errorElement = document.getElementById('imageCountError');
+				
+				if (!countElement) return;
+				
+				countElement.textContent = `Đã thêm: ${count}/${maxImages} ảnh`;
+				
+				if (count < minImages) {
+					countElement.className = 'ms-2 text-danger fw-bold';
+					if (errorElement) {
+						errorElement.textContent = `Cần ít nhất ${minImages} ảnh. Hiện tại có ${count} ảnh.`;
+						errorElement.style.display = 'block';
+					}
+				} else if (count > maxImages) {
+					countElement.className = 'ms-2 text-warning fw-bold';
+					if (errorElement) {
+						errorElement.textContent = `Tối đa ${maxImages} ảnh. Hiện tại có ${count} ảnh.`;
+						errorElement.style.display = 'block';
+					}
+				} else {
+					countElement.className = 'ms-2 text-success fw-bold';
+					if (errorElement) {
+						errorElement.style.display = 'none';
+					}
+				}
+				
+				// Update add button
+				const addBtn = document.getElementById('addImageBtn');
+				if (addBtn) {
+					if (count >= maxImages) {
+						addBtn.disabled = true;
+						addBtn.classList.add('disabled');
+					} else {
+						addBtn.disabled = false;
+						addBtn.classList.remove('disabled');
+					}
+				}
+			}
+			
+			// Debounced update function
+			const debouncedUpdate = debounceUpdate(updateImageCount, 150);
+			
+			// Add image input button
+			const addBtn = document.getElementById('addImageBtn');
+			if (addBtn) {
+				addBtn.addEventListener('click', function() {
+					const count = countAllImages();
+					if (count >= maxImages) {
+						alert('Số lượng ảnh tối đa là ' + maxImages + ' ảnh!');
+						return;
+					}
+					addImageInput();
+				});
+			}
+			
+			function addImageInput() {
+				const container = document.getElementById('imageInputs');
+				if (!container) return;
+				
+				const group = document.createElement('div');
+				group.className = 'image-input-group card p-3 mb-2';
+				group.innerHTML = `
+					<div class="row g-2">
+						<div class="col-md-6">
+							<label class="form-label small">Upload ảnh</label>
+							<input type="file" class="form-control form-control-sm image-file-input" 
+								   name="imageFiles" accept="image/*" onchange="handleImageChange(this)">
+						</div>
+						<div class="col-md-6">
+							<label class="form-label small">Hoặc nhập URL</label>
+							<div class="input-group input-group-sm">
+								<input type="url" class="form-control image-url-input" 
+									   name="imageUrls" placeholder="https://example.com/image.jpg" 
+									   onchange="handleImageChange(this)"
+									   onblur="handleImageChange(this)">
+								<button type="button" class="btn btn-outline-danger" onclick="removeImageInput(this)">
+									<i class="bi bi-trash"></i>
+								</button>
+							</div>
+						</div>
+						<div class="col-12">
+							<div class="image-preview-container" style="display: none;">
+								<img class="img-thumbnail" style="max-width: 200px; max-height: 150px; object-fit: cover;">
+							</div>
+						</div>
+					</div>
+				`;
+				
+				container.appendChild(group);
+				debouncedUpdate();
+			}
+			
+			function handleImageChange(input) {
+				const group = input.closest('.image-input-group');
+				if (!group) return;
+				
+				const previewContainer = group.querySelector('.image-preview-container');
+				const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+				const fileInput = group.querySelector('.image-file-input');
+				const urlInput = group.querySelector('.image-url-input');
+				
+				if (!previewContainer || !previewImg) return;
+				
+				if (input.type === 'file') {
+					// Handle file input
+					const file = fileInput ? fileInput.files[0] : null;
+					if (file) {
+						const reader = new FileReader();
+						reader.onload = function(e) {
+							previewImg.src = e.target.result;
+							previewContainer.style.display = 'block';
+							if (urlInput) {
+								urlInput.value = ''; // Clear URL input
+							}
+							debouncedUpdate();
+						};
+						reader.readAsDataURL(file);
+					} else {
+						previewContainer.style.display = 'none';
+						debouncedUpdate();
+					}
+				} else {
+					// Handle URL input
+					const url = urlInput ? urlInput.value.trim() : '';
+					if (url) {
+						previewImg.src = url;
+						previewImg.onerror = function() {
+							previewContainer.style.display = 'none';
+							alert('Không thể load ảnh từ URL này!');
+							debouncedUpdate();
+						};
+						previewImg.onload = function() {
+							previewContainer.style.display = 'block';
+							if (fileInput) {
+								fileInput.value = ''; // Clear file input
+							}
+							debouncedUpdate();
+						};
+					} else {
+						previewContainer.style.display = 'none';
+						debouncedUpdate();
+					}
+				}
+			}
+			
+			// Make handleImageChange global for inline handlers
+			window.handleImageChange = handleImageChange;
+			window.removeImageInput = function(button) {
+				const group = button.closest('.image-input-group');
+				if (group) {
+					group.remove();
+					debouncedUpdate();
+				}
+			};
+			
+			// Remove existing image
+			document.addEventListener('click', function(e) {
+				if (e.target.closest('.remove-existing-image')) {
+					e.preventDefault();
+					e.stopPropagation();
+					const btn = e.target.closest('.remove-existing-image');
+					const previewItem = btn.closest('.image-preview-item');
+					if (previewItem) {
+						// Remove all related inputs
+						const hiddenInput = previewItem.querySelector('input[name="existingImageUrls"]');
+						if (hiddenInput) {
+							hiddenInput.remove();
+						}
+						// Remove the entire preview item
+						previewItem.remove();
+						// Update count
+						existingImageCount = document.querySelectorAll('input[name="existingImageUrls"]').length;
+						updateImageCount();
+					}
+				}
+			});
+			
+			// Form validation
+			const productForm = document.getElementById('productForm');
+			if (productForm) {
+				productForm.addEventListener('submit', function(e) {
+					// Recalculate existing image count before submit
+					existingImageCount = document.querySelectorAll('input[name="existingImageUrls"]').length;
+					const count = countAllImages();
+					
+					// Debug: Log all image inputs
+					console.log('Submitting form with:', {
+						existingImageCount: existingImageCount,
+						totalCount: count,
+						existingInputs: Array.from(document.querySelectorAll('input[name="existingImageUrls"]')).map(i => i.value),
+						urlInputs: Array.from(document.querySelectorAll('input[name="imageUrls"]')).map(i => i.value).filter(v => v.trim()),
+						fileInputs: Array.from(document.querySelectorAll('input[name="imageFiles"]')).filter(i => i.files && i.files.length > 0).length
+					});
+					
+					if (count < minImages) {
+						e.preventDefault();
+						alert('Vui lòng cung cấp ít nhất ' + minImages + ' ảnh cho sản phẩm! Hiện tại chỉ có ' + count + ' ảnh.');
+						const errorElement = document.getElementById('imageCountError');
+						if (errorElement) {
+							errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+						}
+						return false;
+					}
+					
+					if (count > maxImages) {
+						e.preventDefault();
+						alert('Số lượng ảnh không được vượt quá ' + maxImages + ' ảnh! Hiện tại có ' + count + ' ảnh.');
+						return false;
+					}
+				});
+			}
+			
+			// Initialize: add 2 empty inputs for new products
+			if (existingImageCount === 0) {
+				addImageInput();
+				addImageInput();
+			}
+			
+			// Initial update
+			updateImageCount();
+		})();
+		
+		// Add timestamp to product form images to bypass cache
+		document.addEventListener('DOMContentLoaded', function() {
+			const timestamp = Date.now();
+			document.querySelectorAll('.product-form-image').forEach(img => {
+				if (img.src && !img.src.includes('placeholder.com')) {
+					try {
+						const url = new URL(img.src, window.location.origin);
+						url.searchParams.set('t', timestamp);
+						img.src = url.toString();
+					} catch (e) {
+						// Fallback for relative URLs
+						const baseUrl = img.src.split('?')[0];
+						img.src = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 't=' + timestamp;
+					}
+				}
+			});
+		});
+	</script>
+</body>
+</html>

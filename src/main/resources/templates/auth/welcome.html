@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Chào mừng - Ecommerce</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+.welcome-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.welcome-title {
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.welcome-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    color: white;
+}
+
+.logout-btn {
+    background: #dc3545;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+    color: white;
+}
+
+.user-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #667eea;
+}
+</style>
+</head>
+<body>
+	<header>
+		<h1>Website Bán Hàng Online</h1>
+		<nav>
+			<a th:href="@{/}">Trang chủ</a> | <a th:href="@{/product/list}">Sản phẩm</a> | 
+			<a th:href="@{/cart}">🛒 Giỏ hàng</a> | 
+			<a th:href="@{/auth/logout}">Đăng xuất</a> | 
+			<span>Xin chào, <strong th:text="${username}"></strong></span>
+		</nav>
+	</header>
+
+	<div class="welcome-container">
+		<div class="welcome-icon">🎉</div>
+		<h2 class="welcome-title">Chào mừng, <span th:text="${username}"></span>!</h2>
+		
+		<div class="user-info">
+			<p><strong>✅ Đăng nhập thành công!</strong></p>
+			<p>Bạn có thể bắt đầu mua sắm và khám phá các sản phẩm tuyệt vời.</p>
+		</div>
+		
+		<p class="welcome-message">Hãy chọn một trong các tùy chọn bên dưới để bắt đầu:</p>
+		
+		<div class="welcome-actions">
+			<a th:href="@{/}" class="action-btn">🏠 Trang chủ</a>
+			<a th:href="@{/product/list}" class="action-btn">🛍️ Xem sản phẩm</a>
+			<a th:href="@{/cart}" class="action-btn">🛒 Giỏ hàng</a>
+			<a th:href="@{/auth/logout}" class="action-btn logout-btn">🚪 Đăng xuất</a>
+		</div>
+	</div>
+</body>
+</html>

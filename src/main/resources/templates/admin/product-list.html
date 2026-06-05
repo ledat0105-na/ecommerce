@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản lý sản phẩm - Admin</title>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+	/* Cải thiện CSS cho các nút action button */
+	.action-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		justify-content: center;
+		align-items: center;
+		min-width: 150px;
+	}
+	
+	.action-buttons .action-btn {
+		width: 38px;
+		height: 38px;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0.375rem;
+		transition: all 0.2s ease;
+		font-weight: 500;
+		border-width: 2px;
+	}
+	
+	.action-buttons .action-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+	}
+	
+	.action-buttons .action-btn:active {
+		transform: translateY(0);
+	}
+	
+	.action-buttons .action-btn i {
+		font-size: 1rem;
+		margin: 0;
+	}
+	
+	/* Style cho nút Xem chi tiết (outline-info) */
+	.action-buttons .btn-outline-info {
+		border-color: #17a2b8;
+		color: #17a2b8;
+	}
+	
+	.action-buttons .btn-outline-info:hover {
+		background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+		border-color: #17a2b8;
+		color: white;
+	}
+	
+	/* Style cho nút Sửa (outline-primary) */
+	.action-buttons .btn-outline-primary {
+		border-color: #0d6efd;
+		color: #0d6efd;
+	}
+	
+	.action-buttons .btn-outline-primary:hover {
+		background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+		border-color: #0d6efd;
+		color: white;
+	}
+	
+	/* Style cho nút Xóa (outline-danger) */
+	.action-buttons .btn-outline-danger {
+		border-color: #dc3545;
+		color: #dc3545;
+	}
+	
+	.action-buttons .btn-outline-danger:hover {
+		background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+		border-color: #dc3545;
+		color: white;
+	}
+	
+	/* Đảm bảo cột hành động có đủ không gian */
+	.table td:last-child {
+		vertical-align: middle;
+		text-align: center;
+	}
+	
+	/* Cố định navbar - Độ ưu tiên cao nhất */
+	body.admin-theme nav.navbar,
+	body.admin-theme .navbar.admin-navbar,
+	nav.navbar.admin-navbar {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 100% !important;
+		z-index: 9999 !important;
+		margin: 0 !important;
+	}
+</style>
+</head>
+<body class="bg-light admin-theme">
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark admin-navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/admin}">Website Bán Hàng Online - Admin</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin}">Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" th:href="@{/admin/products}">Sản phẩm</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/orders}">Đơn hàng</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/users}">Người dùng</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<span class="navbar-text me-3">Admin: <strong th:text="${#authentication.name}"></strong></span>
+					</li>
+					<li class="nav-item">
+						<form th:action="@{/auth/logout}" method="post" class="d-inline">
+							<button type="submit" class="btn btn-link nav-link text-white p-0 border-0">Đăng xuất</button>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid py-4">
+		<!-- Success Message Alert -->
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle me-2"></i>
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		
+		<!-- Error Message Alert -->
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-circle me-2"></i>
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		
+		<div class="row">
+			<!-- Main Content -->
+			<div class="col-12">
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<h2>
+						<i class="bi bi-box me-2"></i>Quản lý sản phẩm
+					</h2>
+					<div class="d-flex gap-2">
+						<a th:href="@{/admin/products/new}" class="btn btn-primary">
+							<i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm mới
+						</a>
+					</div>
+				</div>
+
+				<!-- Search & Filter Card - Collapsible -->
+				<div class="card admin-card mb-4">
+					<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" 
+						 style="cursor: pointer;" 
+						 data-bs-toggle="collapse" 
+						 data-bs-target="#searchFilterCollapse" 
+						 aria-expanded="false" 
+						 aria-controls="searchFilterCollapse">
+						<h5 class="card-title mb-0">
+							<i class="bi bi-funnel me-2"></i>Tìm kiếm & Lọc
+						</h5>
+						<i class="bi bi-chevron-down" id="searchToggleIcon"></i>
+					</div>
+					<div class="collapse" id="searchFilterCollapse">
+					<div class="card-body">
+						<!-- Search Form -->
+						<form th:action="@{/admin/products}" method="get">
+							<div class="row g-3">
+								<div class="col-md-5">
+								<label for="search" class="form-label">Tìm kiếm</label>
+								<input type="text" 
+									   id="search" 
+									   name="q" 
+									   class="form-control" 
+									   placeholder="Tên sản phẩm..." 
+									   th:value="${q}">
+								<input type="hidden" name="size" th:value="${size}">
+							</div>
+							
+								<div class="col-md-5">
+								<label for="category" class="form-label">Danh mục</label>
+								<select id="category" name="category" class="form-select">
+									<option value="">Tất cả danh mục</option>
+									<option value="Giày thể thao" th:selected="${category == 'Giày thể thao'}">Giày thể thao</option>
+									<option value="Giày chạy bộ" th:selected="${category == 'Giày chạy bộ'}">Giày chạy bộ</option>
+									<option value="Giày bóng đá" th:selected="${category == 'Giày bóng đá'}">Giày bóng đá</option>
+									<option value="Giày bóng rổ" th:selected="${category == 'Giày bóng rổ'}">Giày bóng rổ</option>
+									<option value="Giày tennis" th:selected="${category == 'Giày tennis'}">Giày tennis</option>
+									<option value="Giày casual" th:selected="${category == 'Giày casual'}">Giày casual</option>
+									<option value="Giày công sở" th:selected="${category == 'Giày công sở'}">Giày công sở</option>
+									<option value="Giày sneaker" th:selected="${category == 'Giày sneaker'}">Giày sneaker</option>
+									<option value="Sandals" th:selected="${category == 'Sandals'}">Sandals</option>
+									<option value="Giày boot" th:selected="${category == 'Giày boot'}">Giày boot</option>
+								</select>
+							</div>
+							
+								<div class="col-md-2 d-flex align-items-end">
+									<div class="d-grid gap-2 w-100">
+								<button type="submit" class="btn btn-primary">
+									<i class="bi bi-search me-2"></i>Tìm kiếm
+								</button>
+								<a th:href="@{/admin/products}" class="btn btn-outline-secondary">
+									<i class="bi bi-arrow-clockwise me-2"></i>Làm mới
+								</a>
+									</div>
+								</div>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+
+				<!-- Products Table -->
+				<div class="card admin-card">
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-hover professional-table">
+								<thead>
+									<tr>
+										<th>STT</th>
+										<th>Hình ảnh</th>
+										<th>Tên sản phẩm</th>
+										<th>Giá</th>
+										<th>Tồn kho</th>
+										<th>Danh mục</th>
+										<th>Thao tác</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="p, pStat : ${products}">
+										<td th:text="${(page.number * page.size) + pStat.index + 1}"></td>
+										<td>
+											<img th:if="${p.images != null and !p.images.isEmpty() and p.images[0].imageUrl != null}"
+												 th:src="${(#strings.startsWith(p.images[0].imageUrl,'http://') or #strings.startsWith(p.images[0].imageUrl,'https://')) ? (p.images[0].imageUrl + '?v=' + p.id) : ((#strings.startsWith(p.images[0].imageUrl,'/') ? p.images[0].imageUrl : '/' + #strings.trim(p.images[0].imageUrl)) + '?v=' + p.id)}"
+												 th:alt="${p.name}" 
+												 class="img-thumbnail product-image" 
+												 style="width: 50px; height: 50px; object-fit: cover;"
+												 loading="lazy"
+												 onerror="this.src='https://via.placeholder.com/50x50/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'"/>
+											<img th:if="${p.images == null or p.images.isEmpty() or (p.images[0].imageUrl == null)}"
+												 th:src="${p.imageUrl != null ? ((#strings.startsWith(p.imageUrl,'http://') or #strings.startsWith(p.imageUrl,'https://')) ? (p.imageUrl + '?v=' + p.id) : ((#strings.startsWith(p.imageUrl,'/') ? p.imageUrl : '/' + #strings.trim(p.imageUrl)) + '?v=' + p.id)) : 'https://via.placeholder.com/50x50/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'}"
+												 th:alt="${p.name}" 
+												 class="img-thumbnail product-image" 
+												 style="width: 50px; height: 50px; object-fit: cover;"
+												 loading="lazy"
+												 onerror="this.src='https://via.placeholder.com/50x50/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'">
+										</td>
+										<td>
+											<strong th:text="${p.name}"></strong>
+											<br>
+											<small class="text-muted" th:text="${p.description}"></small>
+										</td>
+										<td class="text-success fw-bold" th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+										<td>
+											<span class="badge bg-info" th:text="${p.stock} + ' sản phẩm'"></span>
+										</td>
+										<td>
+											<span class="badge bg-secondary" th:text="${p.category}"></span>
+										</td>
+										<td>
+											<div class="action-buttons">
+												<a th:href="@{/admin/products/detail/{id}(id=${p.id})}" 
+												   class="btn btn-sm btn-outline-info action-btn" 
+												   title="Xem chi tiết">
+													<i class="bi bi-eye"></i>
+												</a>
+												<a th:href="@{/admin/products/edit/{id}(id=${p.id})}" 
+												   class="btn btn-sm btn-outline-primary action-btn" 
+												   title="Sửa">
+													<i class="bi bi-pencil"></i>
+												</a>
+												<button type="button" 
+														class="btn btn-sm btn-outline-danger delete-btn action-btn" 
+														data-bs-toggle="modal" 
+														data-bs-target="#deleteModal"
+														th:attr="data-product-id=${p.id}, data-product-name=${p.name}"
+														title="Xóa">
+													<i class="bi bi-trash"></i>
+												</button>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- Pagination -->
+						<nav th:if="${page != null and page.totalPages > 1}" class="mt-4">
+							<ul class="pagination justify-content-center">
+								<li class="page-item" th:classappend="${page.first} ? 'disabled'">
+									<a class="page-link" th:href="@{/admin/products(q=${q}, category=${category}, page=${page.number-1}, size=${size})}" th:if="${!page.first}">« Trước</a>
+									<span class="page-link" th:if="${page.first}">« Trước</span>
+								</li>
+								
+								<li th:each="i : ${#numbers.sequence(0, page.totalPages-1)}" 
+									th:classappend="${i==page.number} ? 'active'" 
+									class="page-item">
+									<a class="page-link" th:href="@{/admin/products(q=${q}, category=${category}, page=${i}, size=${size})}" th:text="${i+1}">1</a>
+								</li>
+								
+								<li class="page-item" th:classappend="${page.last} ? 'disabled'">
+									<a class="page-link" th:href="@{/admin/products(q=${q}, category=${category}, page=${page.number+1}, size=${size})}" th:if="${!page.last}">Tiếp »</a>
+									<span class="page-link" th:if="${page.last}">Tiếp »</span>
+								</li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+
+				<!-- Quick Stats Card - Moved to bottom -->
+				<div class="card admin-card mt-4">
+					<div class="card-header bg-info text-white">
+						<h5 class="card-title mb-0">
+							<i class="bi bi-graph-up me-2"></i>Thống kê nhanh
+						</h5>
+					</div>
+					<div class="card-body">
+						<div class="row text-center">
+							<div class="col-md-3 col-6 mb-3 mb-md-0 position-relative">
+								<div class="pe-md-3">
+									<h4 class="text-primary mb-1" th:text="${page != null ? page.totalElements : 0}">0</h4>
+									<small class="text-muted">Tổng sản phẩm</small>
+								</div>
+								<div class="d-none d-md-block position-absolute top-0 end-0 h-100" style="width: 1px; background-color: #dee2e6;"></div>
+							</div>
+							<div class="col-md-3 col-6 mb-3 mb-md-0 position-relative">
+								<div class="pe-md-3">
+									<h4 class="text-success mb-1" th:text="${page != null ? page.totalPages : 0}">0</h4>
+									<small class="text-muted">Tổng số trang</small>
+								</div>
+								<div class="d-none d-md-block position-absolute top-0 end-0 h-100" style="width: 1px; background-color: #dee2e6;"></div>
+							</div>
+							<div class="col-md-3 col-6 mb-3 mb-md-0 position-relative">
+								<div class="pe-md-3">
+									<h4 class="text-info mb-1" th:text="${page != null ? page.number + 1 : 1}">1</h4>
+									<small class="text-muted">Trang hiện tại</small>
+								</div>
+								<div class="d-none d-md-block position-absolute top-0 end-0 h-100" style="width: 1px; background-color: #dee2e6;"></div>
+							</div>
+							<div class="col-md-3 col-6">
+								<h4 class="text-warning mb-1" th:text="${page != null ? page.size : 10}">10</h4>
+								<small class="text-muted">Sản phẩm/trang</small>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Delete Confirmation Modal -->
+	<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header bg-danger text-white">
+					<h5 class="modal-title" id="deleteModalLabel">
+						<i class="bi bi-exclamation-triangle me-2"></i>Xác nhận xóa sản phẩm
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Bạn có chắc chắn muốn xóa sản phẩm <strong id="productNameToDelete"></strong>?</p>
+					<p class="text-danger mb-0">
+						<i class="bi bi-exclamation-circle me-1"></i>
+						<small>Hành động này không thể hoàn tác!</small>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+						<i class="bi bi-x-circle me-2"></i>Hủy
+					</button>
+					<form id="deleteForm" method="post" class="d-inline">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+						<button type="submit" class="btn btn-danger">
+							<i class="bi bi-trash me-2"></i>Xóa sản phẩm
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<script>
+		// Handle delete button click
+		document.addEventListener('DOMContentLoaded', function() {
+			const deleteButtons = document.querySelectorAll('.delete-btn');
+			const deleteModal = document.getElementById('deleteModal');
+			const productNameElement = document.getElementById('productNameToDelete');
+			const deleteForm = document.getElementById('deleteForm');
+			
+			deleteButtons.forEach(button => {
+				button.addEventListener('click', function() {
+					const productId = this.getAttribute('data-product-id');
+					const productName = this.getAttribute('data-product-name');
+					
+					productNameElement.textContent = productName;
+					deleteForm.action = '/admin/products/delete/' + productId;
+				});
+			});
+		});
+		
+		// Handle search filter collapse
+		document.addEventListener('DOMContentLoaded', function() {
+			const searchCollapse = document.getElementById('searchFilterCollapse');
+			const searchToggleIcon = document.getElementById('searchToggleIcon');
+			const searchCollapseKey = 'admin_products_search_collapsed';
+			
+			if (!searchCollapse || !searchToggleIcon) return;
+			
+			// Load saved state
+			const savedState = localStorage.getItem(searchCollapseKey);
+			if (savedState === 'true') {
+				const bsCollapse = new bootstrap.Collapse(searchCollapse, { toggle: false });
+				bsCollapse.hide();
+				searchToggleIcon.classList.remove('bi-chevron-down');
+				searchToggleIcon.classList.add('bi-chevron-up');
+			}
+			
+			// Update icon on toggle
+			searchCollapse.addEventListener('show.bs.collapse', function() {
+				searchToggleIcon.classList.remove('bi-chevron-up');
+				searchToggleIcon.classList.add('bi-chevron-down');
+				localStorage.setItem(searchCollapseKey, 'false');
+			});
+			
+			searchCollapse.addEventListener('hide.bs.collapse', function() {
+				searchToggleIcon.classList.remove('bi-chevron-down');
+				searchToggleIcon.classList.add('bi-chevron-up');
+				localStorage.setItem(searchCollapseKey, 'true');
+			});
+		});
+		
+		// Add timestamp to product images to bypass cache
+		document.addEventListener('DOMContentLoaded', function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			const isUpdated = urlParams.has('updated');
+			const timestamp = Date.now();
+			
+			// Function to reload images with new timestamp
+			function reloadImages() {
+				document.querySelectorAll('.product-image').forEach(img => {
+					if (img.src && !img.src.includes('placeholder.com')) {
+						try {
+							const url = new URL(img.src, window.location.origin);
+							// Remove old cache-busting parameters
+							url.searchParams.delete('v');
+							url.searchParams.delete('t');
+							// Add new timestamp
+							url.searchParams.set('t', timestamp);
+							url.searchParams.set('v', timestamp);
+							// Force reload by adding another parameter
+							img.src = url.toString() + '&_=' + timestamp;
+						} catch (e) {
+							// Fallback for relative URLs
+							const baseUrl = img.src.split('?')[0];
+							img.src = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 't=' + timestamp + '&v=' + timestamp + '&_=' + timestamp;
+						}
+					}
+				});
+			}
+			
+			// Always add timestamp on page load
+			reloadImages();
+			
+			// If updated=true, force reload images after a short delay
+			if (isUpdated) {
+				setTimeout(function() {
+					reloadImages();
+					// Remove updated parameter from URL after reload
+					urlParams.delete('updated');
+					const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+					window.history.replaceState({}, '', newUrl);
+				}, 500);
+			}
+		});
+	</script>
+</body>
+</html>

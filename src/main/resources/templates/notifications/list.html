@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo - Ecommerce</title>
+    <link rel="icon" type="image/png" th:href="@{/images/Logo_dhktdn.png}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    
+    <style>
+        .notification-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        
+        .notification-item.unread {
+            background-color: #e7f3ff;
+            border-left-color: #0d6efd;
+        }
+        
+        .notification-item.read {
+            background-color: #ffffff;
+            border-left-color: #6c757d;
+            opacity: 0.8;
+        }
+        
+        .notification-time {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">
+                <img th:src="@{/images/Logo_dhktdn.png}" alt="Logo" style="height: 56px; display: inline-block; object-fit: contain;"/>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/product/list}">Sản phẩm</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span th:text="${#authentication.name}">user</span>
+                            <span th:if="${unreadCount != null and unreadCount > 0}" class="badge bg-danger ms-2" th:text="${unreadCount}">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-card-text me-2"></i>Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" th:href="@{/order/history}"><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</a></li>
+                            <li><a class="dropdown-item" th:href="@{/notifications}">
+                                <i class="bi bi-bell me-2"></i>Thông báo
+                                <span th:if="${unreadCount > 0}" class="badge bg-danger ms-2" th:text="${unreadCount}">0</span>
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/auth/logout}" method="post" class="px-3 py-1">
+                                    <button type="submit" class="btn btn-link p-0"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+					
+					<li class="nav-item" th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+						<a class="nav-link" th:href="@{/auth/login}">Đăng nhập</a>
+					</li>
+					<li class="nav-item" th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+						<a class="nav-link" th:href="@{/auth/register}">Đăng ký</a>
+					</li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <!-- Page Header -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bell me-2"></i>Thông báo
+                        </h5>
+                        <div>
+                            <form th:action="@{/notifications/read-all}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-light" th:disabled="${unreadCount == 0}">
+                                    <i class="bi bi-check-all me-1"></i>Đánh dấu tất cả đã đọc
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Success/Error Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i><span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Notifications List -->
+                <div th:if="${notifications != null and !notifications.isEmpty()}">
+                    <div th:each="notification : ${notifications}" 
+                         class="card mb-3 notification-item" 
+                         th:classappend="${notification.isRead} ? 'read' : 'unread'">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-bell-fill notification-icon me-3" 
+                                           th:classappend="${notification.isRead} ? 'text-muted' : 'text-primary'"></i>
+                                        <h6 class="mb-0" th:text="${notification.title}">Tiêu đề thông báo</h6>
+                                        <span th:if="${!notification.isRead}" class="badge bg-primary ms-2">Mới</span>
+                                    </div>
+                                    <p class="mb-2 text-muted" th:utext="${notification.message}">Nội dung thông báo</p>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <small class="notification-time">
+                                            <i class="bi bi-clock me-1"></i>
+                                            <span th:text="${#temporals.format(notification.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                                        </small>
+                                        <div class="btn-group" role="group">
+                                            <a th:if="${notification.order != null}" 
+                                               th:href="@{/order/{id}/success(id=${notification.order.id})}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye me-1"></i>Xem đơn hàng
+                                            </a>
+                                            <a th:if="${notification.message != null and notification.message.contains('/profile/update-request/')}" 
+                                               th:attr="data-message=${notification.message}, data-notification-id=${notification.id}"
+                                               class="btn btn-sm btn-outline-info view-request-detail-link"
+                                               href="#">
+                                                <i class="bi bi-file-earmark-text me-1"></i>Xem chi tiết yêu cầu
+                                            </a>
+                                            <a th:if="${notification.message != null and (notification.message.contains('Yêu cầu #') or notification.message.contains('yêu cầu cập nhật')) and (#authentication != null and #authentication.authorities.?[authority == 'ROLE_ADMIN'].size() > 0)}" 
+                                               th:href="@{/admin/users/update-requests}"
+                                               class="btn btn-sm btn-outline-info">
+                                                <i class="bi bi-file-earmark-text me-1"></i>Xem yêu cầu cập nhật
+                                            </a>
+                                            <form th:if="${!notification.isRead}" 
+                                                  th:action="@{/notifications/{id}/read(id=${notification.id})}" 
+                                                  method="post" 
+                                                  class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-check me-1"></i>Đánh dấu đã đọc
+                                                </button>
+                                            </form>
+                                            <form th:action="@{/notifications/{id}/delete(id=${notification.id})}" 
+                                                  method="post" 
+                                                  class="d-inline"
+                                                  th:onclick="'return confirm(\'Bạn có chắc muốn xóa thông báo này?\')'">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash me-1"></i>Xóa
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div th:if="${notifications == null or notifications.isEmpty()}" class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-bell-slash text-muted" style="font-size: 4rem;"></i>
+                        <p class="text-muted mt-3">Bạn chưa có thông báo nào.</p>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a th:href="@{/product/list}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Tiếp tục mua hàng
+                    </a>
+                    <a th:href="@{/}" class="btn btn-primary">
+                        <i class="bi bi-house me-2"></i>Về trang chủ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Ecommerce</h5>
+                    <p class="mb-0">Cửa hàng trực tuyến uy tín</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Ecommerce. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Extract request ID from notification message and set href for view request detail links
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewRequestLinks = document.querySelectorAll('.view-request-detail-link');
+            viewRequestLinks.forEach(function(link) {
+                const message = link.getAttribute('data-message');
+                if (message) {
+                    // Extract ID from message using regex
+                    const match = message.match(/\/profile\/update-request\/(\d+)/);
+                    if (match && match[1]) {
+                        const requestId = match[1];
+                        link.href = '/profile/update-request/' + requestId;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

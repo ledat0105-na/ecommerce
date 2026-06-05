@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trang chủ - Ecommerce</title>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<link rel="icon" type="image/png" th:href="@{/images/Logo_dhktdn.png}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+	<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+		<div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">
+                <img th:src="@{/images/Logo_dhktdn.png}" alt="Logo" style="height: 56px; display: inline-block; object-fit: contain;"/>
+            </a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a class="nav-link active" th:href="@{/}">Trang chủ</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/product/list}">Sản phẩm</a>
+					</li>
+				</ul>
+                <ul class="navbar-nav">
+                    <!-- Notification Bell - Only show when authenticated -->
+                    <li class="nav-item" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+                        <a class="nav-link position-relative" th:href="@{/notifications}" id="notificationLink">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span th:if="${unreadCount != null and unreadCount > 0}" 
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge-pulse" 
+                                  id="notificationBadge"
+                                  th:text="${unreadCount}">0</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span th:text="${#authentication.name}">user</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-card-text me-2"></i>Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" th:href="@{/order/history}"><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/auth/logout}" method="post" class="px-3 py-1">
+                                    <button type="submit" class="btn btn-link p-0"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+					
+					<li class="nav-item" th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+						<a class="nav-link" th:href="@{/auth/login}">Đăng nhập</a>
+					</li>
+					<li class="nav-item" th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+						<a class="nav-link" th:href="@{/auth/register}">Đăng ký</a>
+					</li>
+                </ul>
+			</div>
+		</div>
+		</nav>
+
+	<div class="hero-section text-white py-5 mb-5">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-6">
+					<h1 class="display-4 fw-bold mb-4 fade-in">Chào mừng đến với Shop Giày & Dép</h1>
+					<p class="lead mb-4 fade-in">Khám phá bộ sưu tập giày và dép đa dạng từ các thương hiệu nổi tiếng. Chất lượng cao, giá cả hợp lý, phong cách thời trang.</p>
+                    <div class="d-flex gap-3 fade-in">
+                        <a th:href="@{/product/list}" class="btn btn-light btn-lg btn-hero">
+                            <i class="bi bi-shop me-2"></i>Xem sản phẩm
+                        </a>
+                        <a th:href="@{/auth/register}"
+                           th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+                           class="btn btn-outline-light btn-lg btn-hero">
+                            <i class="bi bi-person-plus me-2"></i>Đăng ký ngay
+                        </a>
+                    </div>
+				</div>
+                <div class="col-lg-6 text-center">
+                    <img th:src="@{/images/Logo_dhktdn.png}" 
+                         alt="Logo" 
+                         class="img-fluid rounded shadow-lg bounce-in" 
+                         style="max-height: 400px; object-fit: contain; background: white;">
+                </div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container mb-5 section-padding">
+		<div class="row g-4">
+			<div class="col-md-4">
+				<div class="text-center p-4">
+					<div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 feature-icon" style="width: 80px; height: 80px;">
+						<i class="bi bi-truck display-6"></i>
+					</div>
+					<h5 class="fw-bold">Giao hàng nhanh</h5>
+					<p class="text-muted">Miễn phí vận chuyển cho đơn hàng từ 500.000 VNĐ</p>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="text-center p-4">
+					<div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 feature-icon" style="width: 80px; height: 80px;">
+						<i class="bi bi-shield-check display-6"></i>
+					</div>
+					<h5 class="fw-bold">Chất lượng đảm bảo</h5>
+					<p class="text-muted">Sản phẩm chính hãng, bảo hành 12 tháng</p>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="text-center p-4">
+					<div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 feature-icon" style="width: 80px; height: 80px;">
+						<i class="bi bi-headset display-6"></i>
+					</div>
+					<h5 class="fw-bold">Hỗ trợ 24/7</h5>
+					<p class="text-muted">Đội ngũ tư vấn chuyên nghiệp, nhiệt tình</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container mb-5" th:if="${topProducts != null and !topProducts.isEmpty()}">
+		<div class="top-products-section">
+			<div class="row">
+				<div class="col-12">
+					<div class="text-center mb-5">
+						<h2 class="text-primary mb-3">
+							<i class="bi bi-trophy-fill me-2"></i>Top 3 Sản phẩm bán chạy nhất
+						</h2>
+						<p class="text-muted">Những mẫu giày và dép được khách hàng yêu thích nhất</p>
+					</div>
+					
+					<div class="row g-4 justify-content-center">
+						<div th:each="p, iterStat : ${topProducts}" class="col-lg-4 col-md-6">
+							<div class="card h-100 shadow-sm border-0 product-card position-relative">
+								<div class="position-absolute top-0 start-0 m-3">
+									<span th:if="${iterStat.index == 0}" class="badge badge-top-1 fs-6">
+										<i class="bi bi-trophy-fill me-1"></i>#1
+									</span>
+									<span th:if="${iterStat.index == 1}" class="badge badge-top-2 fs-6">
+										<i class="bi bi-award-fill me-1"></i>#2
+									</span>
+									<span th:if="${iterStat.index == 2}" class="badge badge-top-3 fs-6">
+										<i class="bi bi-award me-1"></i>#3
+									</span>
+								</div>
+							<div class="card-body d-flex flex-column">
+								<div class="text-center mb-3">
+									<a th:href="@{/product/detail/{id}(id=${p.id})}" class="text-decoration-none d-block" style="pointer-events: auto;">
+										<img th:with="firstImage=${p.images != null and !p.images.isEmpty() ? p.images[0] : null},
+													imageSrc=${firstImage != null and firstImage.imageUrl != null and !#strings.isEmpty(firstImage.imageUrl) ? 
+														((#strings.startsWith(firstImage.imageUrl,'http://') or #strings.startsWith(firstImage.imageUrl,'https://')) ? firstImage.imageUrl : 
+														(#strings.startsWith(firstImage.imageUrl,'/') ? firstImage.imageUrl : 
+														(#strings.startsWith(firstImage.imageUrl,'uploads/') ? '/' + #strings.trim(firstImage.imageUrl) : 
+														'/images/' + #strings.trim(firstImage.imageUrl)))) : 
+														(p.imageUrl != null and !#strings.isEmpty(p.imageUrl) ? 
+															((#strings.startsWith(p.imageUrl,'http://') or #strings.startsWith(p.imageUrl,'https://')) ? p.imageUrl : 
+															(#strings.startsWith(p.imageUrl,'/') ? p.imageUrl : 
+															(#strings.startsWith(p.imageUrl,'uploads/') ? '/' + #strings.trim(p.imageUrl) : 
+															'/images/' + #strings.trim(p.imageUrl)))) : 
+															'https://via.placeholder.com/300x250/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt')}"
+											 th:src="${imageSrc}"
+											 th:alt="${p.name}" 
+											 class="img-fluid rounded" 
+											 style="height: 250px; width: 100%; object-fit: cover; cursor: pointer; pointer-events: none;"
+											 loading="lazy"
+											 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x250/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'"/>
+									</a>
+								</div>
+								<h5 class="card-title">
+									<a th:href="@{/product/detail/{id}(id=${p.id})}" class="text-decoration-none text-dark" th:text="${p.name}"></a>
+								</h5>
+								<p class="card-text text-success fs-4 fw-bold" th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></p>
+								<div class="mt-auto">
+									<button type="button" 
+									        class="btn btn-success w-100 add-to-cart-btn" 
+									        th:data-product-id="${p.id}"
+									        th:data-product-name="${p.name}"
+									        th:data-product-category="${p.category}"
+									        th:data-is-authenticated="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+										<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container mb-5">
+		<div class="row">
+			<div class="col-12">
+				<div class="text-center mb-5">
+					<h2 class="text-primary mb-3">
+						<i class="bi bi-star-fill me-2"></i>Sản phẩm nổi bật
+					</h2>
+					<p class="text-muted">Bộ sưu tập giày và dép đa dạng với 20 sản phẩm được lựa chọn</p>
+				</div>
+				
+				<div th:if="${products != null}" class="row g-4">
+					<div th:each="p : ${products}" class="col-lg-3 col-md-4 col-sm-6">
+						<div class="card h-100 shadow-sm border-0 product-card">
+							<div class="card-body d-flex flex-column">
+								<div class="text-center mb-3">
+									<a th:href="@{/product/detail/{id}(id=${p.id})}" class="text-decoration-none d-block" style="pointer-events: auto;">
+										<img th:with="firstImage=${p.images != null and !p.images.isEmpty() ? p.images[0] : null},
+													imageSrc=${firstImage != null and firstImage.imageUrl != null and !#strings.isEmpty(firstImage.imageUrl) ? 
+														((#strings.startsWith(firstImage.imageUrl,'http://') or #strings.startsWith(firstImage.imageUrl,'https://')) ? firstImage.imageUrl : 
+														(#strings.startsWith(firstImage.imageUrl,'/') ? firstImage.imageUrl : 
+														(#strings.startsWith(firstImage.imageUrl,'uploads/') ? '/' + #strings.trim(firstImage.imageUrl) : 
+														'/images/' + #strings.trim(firstImage.imageUrl)))) : 
+														(p.imageUrl != null and !#strings.isEmpty(p.imageUrl) ? 
+															((#strings.startsWith(p.imageUrl,'http://') or #strings.startsWith(p.imageUrl,'https://')) ? p.imageUrl : 
+															(#strings.startsWith(p.imageUrl,'/') ? p.imageUrl : 
+															(#strings.startsWith(p.imageUrl,'uploads/') ? '/' + #strings.trim(p.imageUrl) : 
+															'/images/' + #strings.trim(p.imageUrl)))) : 
+															'https://via.placeholder.com/300x200/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt')}"
+											 th:src="${imageSrc}"
+											 th:alt="${p.name}" 
+											 class="img-fluid rounded" 
+											 style="height: 200px; width: 100%; object-fit: cover; cursor: pointer; pointer-events: none;"
+											 loading="lazy"
+											 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'"/>
+									</a>
+								</div>
+								<h6 class="card-title">
+									<a th:href="@{/product/detail/{id}(id=${p.id})}" class="text-decoration-none text-dark" th:text="${p.name}"></a>
+								</h6>
+								<p class="card-text text-success fs-5 fw-bold" th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></p>
+								<div class="mt-auto">
+									<button type="button" 
+									        class="btn btn-success w-100 btn-sm add-to-cart-btn" 
+									        th:data-product-id="${p.id}"
+									        th:data-product-name="${p.name}"
+									        th:data-product-category="${p.category}"
+									        th:data-is-authenticated="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+										<i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+                <div th:if="${products == null}" class="text-center py-5">
+					<i class="bi bi-box display-1 text-muted"></i>
+					<h3 class="text-muted mt-3">Chưa có sản phẩm nào</h3>
+					<p class="text-muted">Hãy quay lại sau để xem các sản phẩm mới nhất!</p>
+				</div>
+				
+				<div class="text-center mt-4">
+					<a th:href="@{/product/list}" class="btn btn-outline-primary btn-lg">
+						<i class="bi bi-arrow-right me-2"></i>Xem tất cả sản phẩm
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="bg-light py-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="text-center mb-5">
+						<h2 class="text-primary mb-3">
+							<i class="bi bi-telephone me-2"></i>Thông tin liên hệ
+						</h2>
+						<p class="text-muted">Liên hệ với chúng tôi để được tư vấn và hỗ trợ tốt nhất</p>
+					</div>
+				</div>
+			</div>
+			<div class="row g-4">
+				<div class="col-lg-4 col-md-6">
+					<div class="text-center p-4">
+						<div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 contact-icon" style="width: 60px; height: 60px;">
+							<i class="bi bi-geo-alt"></i>
+						</div>
+						<h5 class="fw-bold">Địa chỉ</h5>
+						<p class="text-muted mb-0">566 Núi Thành, Phường Hòa Cường<br>Thành phố Đà Nẵng</p>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-6">
+					<div class="text-center p-4">
+						<div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 contact-icon" style="width: 60px; height: 60px;">
+							<i class="bi bi-telephone"></i>
+						</div>
+						<h5 class="fw-bold">Điện thoại</h5>
+						<p class="text-muted mb-0">Hotline: 0123 456 789<br>Mobile: 0705 201 485</p>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-6">
+					<div class="text-center p-4">
+						<div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 contact-icon" style="width: 60px; height: 60px;">
+							<i class="bi bi-envelope"></i>
+						</div>
+						<h5 class="fw-bold">Email</h5>
+						<p class="text-muted mb-0">info@shopgiaydep.com<br>support@shopgiaydep.com</p>
+					</div>
+				</div>
+			</div>
+			<div class="row mt-4">
+				<div class="col-12">
+					<div class="text-center">
+						<h5 class="fw-bold mb-3">Giờ làm việc</h5>
+						<p class="text-muted mb-0">
+							<strong>Thứ 2 - Thứ 6:</strong> 8:00 - 22:00<br>
+							<strong>Thứ 7 - Chủ nhật:</strong> 9:00 - 21:00
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<a th:href="@{/cart}" class="floating-cart" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+		<i class="bi bi-cart3"></i>
+		<span>Giỏ hàng</span>
+		<span class="cart-count" id="cartItemCount" th:text="${cartItemCount}">0</span>
+	</a>
+	
+	<!-- Toast Notification Container -->
+	<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100; margin-top: 80px;">
+		<div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header bg-primary text-white">
+				<i class="bi bi-bell-fill me-2"></i>
+				<strong class="me-auto" id="toastTitle">Thông báo mới</strong>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body" id="toastMessage">
+				Bạn có thông báo mới!
+			</div>
+		</div>
+	</div>
+	<!-- Size Selection Modal -->
+	<div class="modal fade" id="sizeSelectionModal" tabindex="-1" aria-labelledby="sizeSelectionModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" id="sizeSelectionModalLabel">
+						<i class="bi bi-rulers me-2"></i>Chọn size
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-3">Vui lòng chọn size cho sản phẩm: <strong id="sizeModalProductName"></strong></p>
+					<div class="mb-3">
+						<label for="sizeSelect" class="form-label">Size: <span class="text-danger">*</span></label>
+						<select class="form-select" id="sizeSelect" required>
+							<option value="">-- Chọn size --</option>
+							<option value="35">35</option>
+							<option value="36">36</option>
+							<option value="37">37</option>
+							<option value="38">38</option>
+							<option value="39">39</option>
+							<option value="40">40</option>
+							<option value="41">41</option>
+							<option value="42">42</option>
+							<option value="43">43</option>
+							<option value="44">44</option>
+							<option value="45">45</option>
+						</select>
+						<div class="form-text">Vui lòng chọn size trước khi thêm vào giỏ hàng</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="button" class="btn btn-primary" id="confirmAddToCartBtn">
+						<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Login Required Modal -->
+	<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header bg-warning text-dark">
+					<h5 class="modal-title" id="loginRequiredModalLabel">
+						<i class="bi bi-exclamation-triangle me-2"></i>Yêu cầu đăng nhập
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body text-center py-4">
+					<i class="bi bi-person-circle text-warning" style="font-size: 4rem;"></i>
+					<h5 class="mt-3 mb-3">Vui lòng đăng nhập hoặc đăng ký</h5>
+					<p class="text-muted mb-4">Bạn cần đăng nhập hoặc đăng ký tài khoản để thêm sản phẩm vào giỏ hàng.</p>
+					<div class="d-flex gap-3 justify-content-center">
+						<a th:href="@{/auth/login}" class="btn btn-primary btn-lg">
+							<i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập
+						</a>
+						<a th:href="@{/auth/register}" class="btn btn-outline-primary btn-lg">
+							<i class="bi bi-person-plus me-2"></i>Đăng ký
+						</a>
+					</div>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Success Modal -->
+	<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content">
+				<div class="modal-body text-center py-4">
+					<i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+					<h5 class="mt-3 text-success mb-0">Đã thêm vào giỏ hàng thành công!</h5>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		let currentProductId = null;
+		let currentProductName = null;
+		let currentBtn = null;
+		let sizeModalInstance = null;
+		let isProcessing = false; // Flag to prevent multiple rapid clicks
+		
+		// Khởi tạo modal instance một lần
+		document.addEventListener('DOMContentLoaded', function() {
+			const sizeModalElement = document.getElementById('sizeSelectionModal');
+			if (sizeModalElement && !sizeModalInstance) {
+				try {
+					sizeModalInstance = new bootstrap.Modal(sizeModalElement, {
+						backdrop: true,  // Cho phép click vào backdrop để đóng
+						keyboard: true,   // Cho phép nhấn ESC để đóng
+						focus: true       // Tự động focus vào modal khi mở
+					});
+					
+					// Đảm bảo backdrop không chặn tương tác với modal
+					sizeModalElement.addEventListener('shown.bs.modal', function() {
+						// Đảm bảo các element trong modal có thể tương tác
+						const modalContent = sizeModalElement.querySelector('.modal-content');
+						if (modalContent) {
+							modalContent.style.pointerEvents = 'auto';
+							modalContent.style.zIndex = '1056';
+						}
+					});
+					
+					// Xóa backdrop khi đóng modal để không còn chặn
+					sizeModalElement.addEventListener('hidden.bs.modal', function() {
+						// Đảm bảo backdrop được xóa
+						const backdrops = document.querySelectorAll('.modal-backdrop');
+						backdrops.forEach(function(backdrop) {
+							backdrop.remove();
+						});
+						// Xóa class modal-open khỏi body
+						document.body.classList.remove('modal-open');
+						document.body.style.overflow = '';
+						document.body.style.paddingRight = '';
+					});
+				} catch (e) {
+					console.error('Error initializing modal:', e);
+				}
+			}
+		});
+		
+		// Hàm thêm vào giỏ hàng
+		function addToCart(productId, size) {
+			// Prepare form data
+			const formData = new URLSearchParams();
+			formData.append('quantity', '1');
+			if (size) {
+				formData.append('size', size);
+			}
+			
+			// Get CSRF token
+			const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+			const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+			
+			// Send AJAX request
+			const headers = {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			};
+			if (csrfHeader && csrfToken) {
+				headers[csrfHeader] = csrfToken;
+			}
+			
+			// Disable button
+			if (currentBtn) {
+				const originalText = currentBtn.innerHTML;
+				currentBtn.disabled = true;
+				currentBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang thêm...';
+			}
+			
+			fetch('/cart/add-ajax/' + productId, {
+				method: 'POST',
+				headers: headers,
+				body: formData.toString()
+			})
+			.then(response => {
+				// Check if response is ok
+				if (!response.ok) {
+					return response.text().then(text => {
+						try {
+							return JSON.parse(text);
+						} catch (e) {
+							throw new Error('Server error: ' + response.status + ' ' + response.statusText);
+						}
+					});
+				}
+				// Check content type before parsing JSON
+				const contentType = response.headers.get('content-type');
+				if (contentType && contentType.includes('application/json')) {
+					return response.json();
+				} else {
+					return response.text().then(text => {
+						console.error('Unexpected response type:', contentType, text);
+						throw new Error('Server trả về dữ liệu không hợp lệ. Vui lòng thử lại!');
+					});
+				}
+			})
+			.then(data => {
+				// Reset processing flag
+				isProcessing = false;
+				
+				// Re-enable button
+				if (currentBtn) {
+					currentBtn.disabled = false;
+					currentBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ';
+				}
+				
+				if (data && data.success) {
+					// Update cart count in floating cart
+					const cartCountElement = document.getElementById('cartItemCount');
+					if (cartCountElement && data.cartCount !== undefined) {
+						cartCountElement.textContent = data.cartCount;
+					}
+					
+					// Close size selection modal if open
+					if (sizeModalInstance) {
+						sizeModalInstance.hide();
+					} else {
+						const sizeModal = bootstrap.Modal.getInstance(document.getElementById('sizeSelectionModal'));
+						if (sizeModal) {
+							sizeModal.hide();
+						}
+					}
+					
+					// Show success modal and auto-close after 1 second
+					const successModalElement = document.getElementById('addToCartModal');
+					const successModal = new bootstrap.Modal(successModalElement, {
+						backdrop: 'static',
+						keyboard: false
+					});
+					successModal.show();
+					
+					// Auto-close after 1 second
+					setTimeout(function() {
+						successModal.hide();
+					}, 1000);
+				} else {
+					alert(data?.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				isProcessing = false;
+				if (currentBtn) {
+					currentBtn.disabled = false;
+					currentBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ';
+				}
+				alert(error.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng. Vui lòng thử lại!');
+			});
+		}
+		
+		// Handle add to cart button clicks - sử dụng event delegation (optimized)
+		document.addEventListener('click', function(e) {
+			// Prevent multiple rapid clicks
+			if (isProcessing) {
+				e.preventDefault();
+				e.stopPropagation();
+				return false;
+			}
+			
+			if (e.target.closest('.add-to-cart-btn')) {
+				e.preventDefault();
+				e.stopPropagation();
+				isProcessing = true;
+				
+				const btn = e.target.closest('.add-to-cart-btn');
+				const isAuthenticated = btn.getAttribute('data-is-authenticated') === 'true';
+				
+				// Kiểm tra nếu chưa đăng nhập, hiển thị modal yêu cầu đăng nhập
+				if (!isAuthenticated) {
+					const loginRequiredModalElement = document.getElementById('loginRequiredModal');
+					if (loginRequiredModalElement) {
+						const loginModal = new bootstrap.Modal(loginRequiredModalElement, {
+							backdrop: true,
+							keyboard: true,
+							focus: true
+						});
+						loginModal.show();
+					}
+					isProcessing = false;
+					return;
+				}
+				
+				// Nếu đã đăng nhập, tiếp tục xử lý thêm vào giỏ hàng
+				currentProductId = btn.getAttribute('data-product-id');
+				currentProductName = btn.getAttribute('data-product-name');
+				currentBtn = btn;
+				
+				// Luôn hiển thị modal chọn size trước khi thêm vào giỏ
+				const productNameEl = document.getElementById('sizeModalProductName');
+				const sizeSelectEl = document.getElementById('sizeSelect');
+				
+				if (productNameEl) productNameEl.textContent = currentProductName;
+				if (sizeSelectEl) sizeSelectEl.value = '';
+				
+				// Sử dụng instance đã khởi tạo hoặc tạo mới
+				if (!sizeModalInstance) {
+					const sizeModalElement = document.getElementById('sizeSelectionModal');
+					if (sizeModalElement) {
+						sizeModalInstance = new bootstrap.Modal(sizeModalElement, {
+							backdrop: true,
+							keyboard: true,
+							focus: true
+						});
+					}
+				}
+				
+				if (sizeModalInstance) {
+					sizeModalInstance.show();
+					// Reset processing flag after modal is shown
+					setTimeout(function() {
+						isProcessing = false;
+					}, 300);
+				} else {
+					isProcessing = false;
+				}
+			}
+		}, { passive: false });
+		
+		// Handle confirm add to cart from size modal - sử dụng event delegation (optimized)
+		document.addEventListener('click', function(e) {
+			if (e.target.id === 'confirmAddToCartBtn' || e.target.closest('#confirmAddToCartBtn')) {
+				e.preventDefault();
+				e.stopPropagation();
+				
+				const sizeSelectEl = document.getElementById('sizeSelect');
+				if (!sizeSelectEl) return;
+				
+				const size = sizeSelectEl.value;
+				if (!size || size.trim() === '') {
+					alert('Vui lòng chọn size trước khi thêm vào giỏ hàng!');
+					sizeSelectEl.focus();
+					return;
+				}
+				
+				if (currentProductId) {
+					addToCart(currentProductId, size);
+				}
+			}
+		}, { passive: false });
+		
+		// Poll for new notifications every 5 seconds
+		let notificationPollInterval;
+		const isAuthenticated = /*[[${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}]]*/ false;
+		
+		if (isAuthenticated) {
+			function showToastNotification(title, message) {
+				const toastElement = document.getElementById('notificationToast');
+				const toastTitle = document.getElementById('toastTitle');
+				const toastMessage = document.getElementById('toastMessage');
+				
+				if (toastElement && toastTitle && toastMessage) {
+					toastTitle.textContent = title || 'Thông báo mới';
+					// Strip HTML tags from message for toast
+					const tempDiv = document.createElement('div');
+					tempDiv.innerHTML = message || 'Bạn có thông báo mới!';
+					toastMessage.textContent = tempDiv.textContent || tempDiv.innerText || 'Bạn có thông báo mới!';
+					
+					const toast = new bootstrap.Toast(toastElement, {
+						autohide: true,
+						delay: 5000
+					});
+					toast.show();
+				}
+			}
+			
+			function checkNotifications() {
+				fetch('/notifications/unread-count')
+					.then(response => response.json())
+					.then(count => {
+						const badge = document.getElementById('notificationBadge');
+						const link = document.getElementById('notificationLink');
+						
+						if (count > 0) {
+							if (badge) {
+								badge.textContent = count;
+								badge.style.display = 'inline-block';
+								badge.classList.add('notification-badge-pulse');
+							} else if (link) {
+								// Create badge if it doesn't exist
+								const newBadge = document.createElement('span');
+								newBadge.id = 'notificationBadge';
+								newBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge-pulse';
+								newBadge.textContent = count;
+								link.appendChild(newBadge);
+							}
+							
+							// Check for new notifications and show toast
+							if (window.lastNotificationCount !== undefined && count > window.lastNotificationCount) {
+								// Fetch latest notification
+								fetch('/notifications/latest')
+									.then(response => response.json())
+									.then(data => {
+										if (data.hasNew) {
+											showToastNotification(data.title, data.message);
+										}
+									})
+									.catch(error => {
+										console.error('Error fetching latest notification:', error);
+									});
+								
+								// Show browser notification if permission granted
+								if (Notification.permission === 'granted') {
+									new Notification('Thông báo mới', {
+										body: 'Bạn có ' + count + ' thông báo chưa đọc',
+										icon: '/images/Logo_dhktdn.png'
+									});
+								}
+							}
+							window.lastNotificationCount = count;
+						} else {
+							if (badge) {
+								badge.style.display = 'none';
+								badge.classList.remove('notification-badge-pulse');
+							}
+							window.lastNotificationCount = 0;
+						}
+					})
+					.catch(error => {
+						console.error('Error checking notifications:', error);
+					});
+			}
+			
+			// Request notification permission
+			if ('Notification' in window && Notification.permission === 'default') {
+				Notification.requestPermission();
+			}
+			
+			// Initialize lastNotificationCount
+			window.lastNotificationCount = /*[[${unreadCount}]]*/ 0;
+			
+			// Check immediately and then every 5 seconds
+			checkNotifications();
+			notificationPollInterval = setInterval(checkNotifications, 5000);
+		}
+		
+		// Cleanup on page unload
+		window.addEventListener('beforeunload', function() {
+			if (notificationPollInterval) {
+				clearInterval(notificationPollInterval);
+			}
+		});
+	</script>
+</body>
+</html>

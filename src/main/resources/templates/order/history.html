@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử đơn hàng - Ecommerce</title>
+    <link rel="icon" type="image/png" th:href="@{/images/Logo_dhktdn.png}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 1030 !important; width: 100% !important;">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">
+                <img th:src="@{/images/Logo_dhktdn.png}" alt="Logo" style="height: 56px; display: inline-block; object-fit: contain;"/>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/product/list}">Sản phẩm</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span th:text="${#authentication.name}">user</span>
+                            <span th:if="${unreadCount != null and unreadCount > 0}" class="badge bg-danger ms-2" th:text="${unreadCount}">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-card-text me-2"></i>Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" th:href="@{/order/history}"><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</a></li>
+                            <li><a class="dropdown-item" th:href="@{/notifications}">
+                                <i class="bi bi-bell me-2"></i>Thông báo
+                                <span th:if="${unreadCount != null and unreadCount > 0}" class="badge bg-danger ms-2" th:text="${unreadCount}">0</span>
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/auth/logout}" method="post" class="px-3 py-1">
+                                    <button type="submit" class="btn btn-link p-0"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+					
+					<li class="nav-item" th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+						<a class="nav-link" th:href="@{/auth/login}">Đăng nhập</a>
+					</li>
+					<li class="nav-item" th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+						<a class="nav-link" th:href="@{/auth/register}">Đăng ký</a>
+					</li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        .sticky-header {
+            position: -webkit-sticky !important; /* Safari support */
+            position: sticky !important;
+            top: 76px !important; /* Navbar height (76px) - cố định ngay dưới navbar */
+            z-index: 1025 !important; /* Cao hơn các element khác nhưng thấp hơn navbar (1030) */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            border-radius: 8px;
+            background: white !important;
+            margin-bottom: 1.5rem;
+            /* Tối ưu hiệu suất cho sticky */
+            will-change: transform;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            /* Đảm bảo luôn hiển thị */
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* Ensure sticky works even when scrolling */
+        .sticky-header.sticky-active {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+            background: white !important;
+        }
+        
+        /* Đảm bảo card-header bên trong cũng được cố định */
+        .sticky-header .card-header {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .sticky-header {
+                top: 76px !important; /* Giữ nguyên để phù hợp với navbar */
+            }
+            .sticky-header .card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start !important;
+            }
+            .sticky-header .card-header .d-flex {
+                width: 100%;
+                flex-direction: column;
+            }
+            .sticky-header .card-header .btn {
+                width: 100%;
+            }
+        }
+    </style>
+    
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10" style="position: relative;">
+                <!-- Page Header with Sticky Navigation Buttons -->
+                <div class="card professional-card mb-4 sticky-header">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center flex-wrap">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng
+                        </h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a th:href="@{/product/list}" class="btn btn-light btn-sm">
+                                <i class="bi bi-cart me-1"></i>Tiếp tục mua hàng
+                            </a>
+                            <a th:href="@{/}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-house me-1"></i>Về trang chủ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Orders List -->
+                <div th:if="${orders != null and !orders.isEmpty()}">
+                    <div th:each="order : ${orders}" class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-receipt me-2"></i>Đơn hàng <span th:text="${T(util.OrderUtils).formatOrderId(order.id)}">#HD00001</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Mã đơn hàng:</strong></p>
+                                    <p th:text="${T(util.OrderUtils).formatOrderId(order.id)}">#HD00001</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Ngày đặt hàng:</strong></p>
+                                    <p th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Trạng thái:</strong></p>
+                                    <span th:if="${order.status == 'NEW'}" class="badge bg-warning text-dark fs-6">Chờ duyệt</span>
+                                    <span th:if="${order.status == 'APPROVED'}" class="badge bg-info fs-6">Đã duyệt</span>
+                                    <span th:if="${order.status == 'PAID'}" class="badge bg-success fs-6">Đã thanh toán</span>
+                                    <span th:if="${order.status == 'COMPLETED'}" class="badge bg-primary fs-6">Hoàn thành</span>
+                                    <span th:if="${order.status == 'CANCELLED'}" class="badge bg-danger fs-6">Đã hủy</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Tổng tiền:</strong></p>
+                                    <p class="fs-5 text-primary fw-bold" 
+                                       th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                        0 VNĐ
+                                    </p>
+                                </div>
+                            </div>
+                            <div th:if="${order.status == 'CANCELLED' and order.cancelReason != null}" class="row mb-3">
+                                <div class="col-12">
+                                    <div class="alert alert-danger mb-0">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>Lý do hủy:</strong> <span th:text="${order.cancelReason}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <a th:href="@{/order/{id}/success(id=${order.id})}" class="btn btn-primary">
+                                    <i class="bi bi-eye me-2"></i>Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div th:if="${orders == null or orders.isEmpty()}" class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                        <h4 class="mt-3 text-muted">Chưa có đơn hàng nào</h4>
+                        <p class="text-muted">Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm!</p>
+                        <a th:href="@{/product/list}" class="btn btn-primary mt-3">
+                            <i class="bi bi-cart me-2"></i>Tiếp tục mua hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Ecommerce</h5>
+                    <p class="mb-0">Cửa hàng trực tuyến uy tín</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Ecommerce. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sticky Header Enhancement Script -->
+    <script>
+        (function() {
+            const stickyHeader = document.querySelector('.sticky-header');
+            if (stickyHeader) {
+                // Add active class when scrolling
+                let lastScrollTop = 0;
+                window.addEventListener('scroll', function() {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    if (scrollTop > 100) {
+                        stickyHeader.classList.add('sticky-active');
+                    } else {
+                        stickyHeader.classList.remove('sticky-active');
+                    }
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                }, false);
+            }
+        })();
+    </script>
+</body>
+</html>
+

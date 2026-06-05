@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chi tiết sản phẩm - Admin</title>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+	.product-image-gallery {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+		margin-top: 20px;
+	}
+	.product-image-item {
+		position: relative;
+		border: 2px solid #dee2e6;
+		border-radius: 8px;
+		overflow: hidden;
+		width: 200px;
+		height: 200px;
+	}
+	.product-image-item img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.main-image {
+		width: 100%;
+		max-width: 500px;
+		border-radius: 10px;
+		box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+	}
+	
+	/* Cố định navbar - Độ ưu tiên cao nhất */
+	body.admin-theme nav.navbar,
+	body.admin-theme .navbar.admin-navbar,
+	nav.navbar.admin-navbar {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 100% !important;
+		z-index: 9999 !important;
+		margin: 0 !important;
+	}
+</style>
+</head>
+<body class="bg-light admin-theme">
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark admin-navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/admin}">Website Bán Hàng Online - Admin</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin}">Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" th:href="@{/admin/products}">Sản phẩm</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/orders}">Đơn hàng</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/users}">Người dùng</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<span class="navbar-text me-3">Admin: <strong th:text="${#authentication.name}"></strong></span>
+					</li>
+					<li class="nav-item">
+						<form th:action="@{/auth/logout}" method="post" class="d-inline">
+							<button type="submit" class="btn btn-link nav-link text-white p-0 border-0">Đăng xuất</button>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container py-4">
+		<div class="row">
+			<div class="col-12">
+				<nav aria-label="breadcrumb" class="mb-4">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+						<li class="breadcrumb-item"><a th:href="@{/admin/products}">Sản phẩm</a></li>
+						<li class="breadcrumb-item active">Chi tiết sản phẩm</li>
+					</ol>
+				</nav>
+
+				<!-- Success/Error Messages -->
+				<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+					<i class="bi bi-check-circle me-2"></i><span th:text="${successMessage}"></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+					<i class="bi bi-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<h2 class="text-primary">
+						<i class="bi bi-box me-2"></i>Chi tiết sản phẩm
+					</h2>
+					<div>
+						<a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn btn-primary me-2">
+							<i class="bi bi-pencil me-2"></i>Sửa sản phẩm
+						</a>
+						<a th:href="@{/admin/products}" class="btn btn-outline-secondary">
+							<i class="bi bi-arrow-left me-2"></i>Quay lại
+						</a>
+					</div>
+				</div>
+
+				<div class="row">
+					<!-- Product Images -->
+					<div class="col-md-5">
+						<div class="card admin-card">
+							<div class="card-body">
+								<h5 class="card-title mb-3">
+									<i class="bi bi-images me-2"></i>Hình ảnh sản phẩm
+								</h5>
+								
+								<!-- Main Image -->
+								<div class="text-center mb-4">
+									<img id="mainImage" 
+										 th:src="${product.images != null and !product.images.isEmpty() and product.images[0].imageUrl != null ? 
+										 	((#strings.startsWith(product.images[0].imageUrl,'http://') or #strings.startsWith(product.images[0].imageUrl,'https://')) ? 
+										 	(product.images[0].imageUrl + '?v=' + product.id) : 
+										 	((#strings.startsWith(product.images[0].imageUrl,'/') ? product.images[0].imageUrl : '/' + #strings.trim(product.images[0].imageUrl)) + '?v=' + product.id)) : 
+										 	(product.imageUrl != null ? ((#strings.startsWith(product.imageUrl,'http://') or #strings.startsWith(product.imageUrl,'https://')) ? (product.imageUrl + '?v=' + product.id) : ((#strings.startsWith(product.imageUrl,'/') ? product.imageUrl : '/' + #strings.trim(product.imageUrl)) + '?v=' + product.id)) : 'https://via.placeholder.com/500x500/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt')}"
+										 class="main-image"
+										 alt="Main product image"
+										 onerror="this.src='https://via.placeholder.com/500x500/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'">
+								</div>
+								
+								<!-- Thumbnail Gallery -->
+								<div th:if="${product.images != null and !product.images.isEmpty()}" class="product-image-gallery">
+									<div th:each="image, iterStat : ${product.images}" 
+										 class="product-image-item"
+										 th:data-image-url="${(#strings.startsWith(image.imageUrl,'http://') or #strings.startsWith(image.imageUrl,'https://')) ? (image.imageUrl + '?v=' + product.id) : ((#strings.startsWith(image.imageUrl,'/') ? image.imageUrl : '/' + #strings.trim(image.imageUrl)) + '?v=' + product.id)}"
+										 style="cursor: pointer;"
+										 onclick="changeMainImageFromData(this)">
+										<img th:src="${(#strings.startsWith(image.imageUrl,'http://') or #strings.startsWith(image.imageUrl,'https://')) ? (image.imageUrl + '?v=' + product.id) : ((#strings.startsWith(image.imageUrl,'/') ? image.imageUrl : '/' + #strings.trim(image.imageUrl)) + '?v=' + product.id)}"
+											 th:alt="${product.name}"
+											 onerror="this.src='https://via.placeholder.com/200x200/CCCCCC/666666?text=H%C3%ACnh+%E1%BA%A3nh+%C4%91ang+c%E1%BA%ADp+nh%E1%BA%ADt'">
+									</div>
+								</div>
+								<div th:if="${product.images == null or product.images.isEmpty()}">
+									<p class="text-muted">Không có hình ảnh</p>
+									<p class="text-danger small" th:if="${product.imageUrl != null}">
+										Debug: product.imageUrl = <span th:text="${product.imageUrl}"></span>
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Product Information -->
+					<div class="col-md-7">
+						<div class="card admin-card">
+							<div class="card-body">
+								<h5 class="card-title mb-4">
+									<i class="bi bi-info-circle me-2"></i>Thông tin sản phẩm
+								</h5>
+								
+								<table class="table table-borderless">
+									<tbody>
+										<tr>
+											<th width="30%">ID:</th>
+											<td><span class="badge bg-secondary" th:text="${product.id}">-</span></td>
+										</tr>
+										<tr>
+											<th>Tên sản phẩm:</th>
+											<td><strong th:text="${product.name}">-</strong></td>
+										</tr>
+										<tr>
+											<th>Danh mục:</th>
+											<td>
+												<span class="badge bg-primary" th:text="${product.category}">-</span>
+											</td>
+										</tr>
+										<tr>
+											<th>Giá:</th>
+											<td>
+												<span class="text-success fw-bold fs-5" 
+													  th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">-</span>
+											</td>
+										</tr>
+										<tr>
+											<th>Tồn kho:</th>
+											<td>
+												<span class="badge bg-info" th:text="${product.stock} + ' sản phẩm'">-</span>
+											</td>
+										</tr>
+										<tr>
+											<th>Mô tả:</th>
+											<td>
+												<p th:text="${product.description != null ? product.description : 'Chưa có mô tả'}">-</p>
+											</td>
+										</tr>
+										<tr>
+											<th>Số lượng ảnh:</th>
+											<td>
+												<span class="badge bg-secondary" 
+													  th:text="${product.images != null ? product.images.size() : 0} + ' ảnh'">-</span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<!-- Actions -->
+						<div class="card admin-card mt-4">
+							<div class="card-body">
+								<h5 class="card-title mb-3">
+									<i class="bi bi-gear me-2"></i>Thao tác
+								</h5>
+								<div class="d-grid gap-2">
+									<a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn btn-primary">
+										<i class="bi bi-pencil me-2"></i>Sửa sản phẩm
+									</a>
+									<form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" class="d-inline">
+										<button type="submit" class="btn btn-danger w-100" 
+												onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+											<i class="bi bi-trash me-2"></i>Xóa sản phẩm
+										</button>
+									</form>
+									<a th:href="@{/admin/products}" class="btn btn-outline-secondary">
+										<i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<script>
+		// Reload images when page is updated (to bypass cache)
+		document.addEventListener('DOMContentLoaded', function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.has('updated')) {
+				// Force reload all images by adding fresh timestamp
+				const timestamp = Date.now();
+				
+				// Reload main image
+				const mainImage = document.getElementById('mainImage');
+				if (mainImage && mainImage.src) {
+					const url = new URL(mainImage.src, window.location.origin);
+					url.searchParams.set('t', timestamp);
+					url.searchParams.set('v', timestamp);
+					mainImage.src = url.toString();
+					// Force browser to reload by setting src again
+					mainImage.src = url.toString() + '&_=' + timestamp;
+				}
+				
+				// Reload all thumbnail images
+				document.querySelectorAll('.product-image-item img').forEach(img => {
+					if (img.src) {
+						try {
+							const url = new URL(img.src, window.location.origin);
+							url.searchParams.set('t', timestamp);
+							url.searchParams.set('v', timestamp);
+							img.src = url.toString() + '&_=' + timestamp;
+						} catch (e) {
+							// Fallback for relative URLs
+							const baseUrl = img.src.split('?')[0];
+							img.src = baseUrl + '?v=' + timestamp + '&t=' + timestamp + '&_=' + timestamp;
+						}
+					}
+				});
+				
+				// Update data-image-url for thumbnails
+				document.querySelectorAll('.product-image-item').forEach(item => {
+					const dataUrl = item.getAttribute('data-image-url');
+					if (dataUrl) {
+						try {
+							const url = new URL(dataUrl, window.location.origin);
+							url.searchParams.set('t', timestamp);
+							url.searchParams.set('v', timestamp);
+							item.setAttribute('data-image-url', url.toString() + '&_=' + timestamp);
+						} catch (e) {
+							// Fallback for relative URLs
+							const baseUrl = dataUrl.split('?')[0];
+							item.setAttribute('data-image-url', baseUrl + '?v=' + timestamp + '&t=' + timestamp + '&_=' + timestamp);
+						}
+					}
+				});
+				
+				// Remove updated parameter from URL after reloading
+				setTimeout(function() {
+					const newUrl = window.location.pathname + window.location.search.replace(/[?&]updated=true/, '');
+					window.history.replaceState({}, '', newUrl);
+				}, 1000);
+			}
+		});
+		
+		function changeMainImage(imageUrl) {
+			const mainImage = document.getElementById('mainImage');
+			if (mainImage) {
+				mainImage.src = imageUrl;
+			}
+		}
+		
+		function changeMainImageFromData(element) {
+			const imageUrl = element.getAttribute('data-image-url');
+			if (imageUrl) {
+				changeMainImage(imageUrl);
+			}
+		}
+	</script>
+</body>
+</html>
+

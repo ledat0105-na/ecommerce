@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng ký - Ecommerce</title>
+<link rel="icon" type="image/png" th:href="@{/images/Logo_dhktdn.png}">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+	rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+    body.bg-light {
+        background: linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)),
+                    url('/images/BackGround.png') center / cover no-repeat fixed;
+    }
+</style>
+</head>
+<body class="bg-light">
+	<nav class="navbar navbar-expand-lg navbar-dark"
+		style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">
+                <img th:src="@{/images/Logo_dhktdn.png}" alt="Logo" style="height: 56px; display: inline-block; object-fit: contain;"/>
+            </a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item"><a class="nav-link" th:href="@{/}">Trang
+							chủ</a></li>
+					<li class="nav-item"><a class="nav-link"
+						th:href="@{/product/list}">Sản phẩm</a></li>
+				</ul>
+				<ul class="navbar-nav">
+					<li class="nav-item"><a class="nav-link"
+						th:href="@{/auth/login}">Đăng nhập</a></li>
+					<li class="nav-item"><a class="nav-link active"
+						th:href="@{/auth/register}">Đăng ký</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-end">
+            <div class="col-md-6 col-lg-5">
+				<div class="card shadow">
+					<div class="card-body p-4">
+						<div class="text-center mb-4">
+							<img src="/images/LogoDAU.png" alt="Logo DAU" class="mb-3"
+								style="height: 60px;">
+							<h2 class="text-primary">Đăng ký tài khoản</h2>
+						</div>
+
+						<div th:if="${error}" class="alert alert-danger" role="alert">
+							<i class="bi bi-exclamation-triangle me-2"></i> <span
+								th:text="${error}"></span>
+						</div>
+
+						<!-- Modal success centered -->
+						<div class="modal fade" id="registerSuccessModal" tabindex="-1"
+							aria-hidden="true"
+							th:classappend="${showSuccessDialog} ? ' show' : ''"
+							th:styleappend="${showSuccessDialog} ? 'display:block' : ''">
+							<div class="modal-dialog modal-dialog-centered">
+								<div class="modal-content">
+									<div class="modal-header bg-success text-white">
+										<h5 class="modal-title">
+											<i class="bi bi-check-circle me-2"></i>Đăng ký thành công
+										</h5>
+										<button type="button" class="btn-close btn-close-white"
+											data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body text-center">
+										<p class="mb-3" th:text="${success}">Đăng ký thành công!
+											Vui lòng đăng nhập để tiếp tục.</p>
+										<a th:href="@{/auth/login}" class="btn btn-success"> <i
+											class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập ngay
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<form th:action="@{/auth/register}" method="post"
+							th:object="${form}" enctype="multipart/form-data">
+							<div class="mb-3">
+								<label for="username" class="form-label">Tên đăng nhập <span
+									class="text-danger">*</span></label> <input type="text"
+									class="form-control" id="username" th:field="*{username}"
+									required>
+							</div>
+
+							<div class="mb-3">
+								<label for="fullName" class="form-label">Họ và tên <span
+									class="text-danger">*</span></label> <input type="text"
+									class="form-control" id="fullName" th:field="*{fullName}"
+									required>
+							</div>
+
+							<div class="mb-3">
+								<label for="email" class="form-label">Email</label> <input
+									type="email" class="form-control" id="email"
+									th:field="*{email}">
+							</div>
+
+							<div class="mb-3">
+								<label for="phone" class="form-label">Số điện thoại</label> <input
+									type="tel" class="form-control" id="phone" th:field="*{phone}"
+									placeholder="Ví dụ: 0901234567">
+							</div>
+
+							<div class="row">
+								<div class="col-md-4 mb-3">
+									<label for="province" class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+									<select id="province" class="form-select" name="province" required>
+										<option value="">-- Chọn tỉnh/thành phố --</option>
+									</select>
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="district" class="form-label">Quận/Huyện <span class="text-danger">*</span></label>
+									<select id="district" class="form-select" name="district" required disabled>
+										<option value="">-- Chọn quận/huyện --</option>
+									</select>
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="ward" class="form-label">Phường/Xã <span class="text-danger">*</span></label>
+									<select id="ward" class="form-select" name="ward" required disabled>
+										<option value="">-- Chọn phường/xã --</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label for="address" class="form-label">Địa chỉ chi tiết</label>
+								<textarea class="form-control" id="address"
+									th:field="*{address}" rows="2"
+									placeholder="Số nhà, tên đường..."></textarea>
+							</div>
+
+							<!-- Hidden fields để gửi tên đầy đủ -->
+							<input type="hidden" id="provinceName" name="province">
+							<input type="hidden" id="districtName" name="district">
+							<input type="hidden" id="wardName" name="ward">
+							<!-- Hidden field để lưu location (backward compatibility) -->
+							<input type="hidden" id="location" name="location" th:field="*{location}">
+
+							<div class="mb-3">
+								<label for="password" class="form-label">Mật khẩu <span
+									class="text-danger">*</span></label> <input type="password"
+									class="form-control" id="password" th:field="*{password}"
+									required>
+							</div>
+
+							<div class="mb-3">
+								<label for="confirmPassword" class="form-label">Xác nhận
+									mật khẩu <span class="text-danger">*</span>
+								</label> <input type="password" class="form-control"
+									id="confirmPassword" th:field="*{confirmPassword}" required>
+							</div>
+							
+                            <div class="mb-3">
+                                <label for="avatar" class="form-label">Ảnh đại diện</label> <input
+                                    type="file" class="form-control" id="avatar" name="avatar"
+                                    accept="image/*">
+                                <div class="form-text">Tối đa 3MB. Định dạng phổ biến:
+                                    JPG, PNG.</div>
+                            </div>
+                           
+                            <div class="mb-3">
+                                <label for="cv" class="form-label">CV (PDF/DOC/DOCX)</label>
+                                <input type="file" class="form-control" id="cv" name="cv" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                <div class="form-text">Tối đa 5MB. Định dạng: PDF, DOC, DOCX.</div>
+                            </div>
+
+							<input type="hidden" name="role" value="USER">
+
+							<button type="submit" class="btn btn-primary w-100 mb-3">
+								<i class="bi bi-person-plus me-2"></i>Đăng ký
+							</button>
+						</form>
+
+
+						<div class="text-center">
+							<p class="text-muted">
+								Đã có tài khoản? <a th:href="@{/auth/login}"
+									class="text-decoration-none fw-bold">Đăng nhập ngay</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script th:src="@{/js/address-api.js}"></script>
+	<script>
+		// Initialize address selects
+		initAddressSelects({
+			provinceSelectId: 'province',
+			districtSelectId: 'district',
+			wardSelectId: 'ward'
+		});
+
+		// Update hidden fields with selected names
+		document.addEventListener('DOMContentLoaded', function() {
+			const provinceSelect = document.getElementById('province');
+			const districtSelect = document.getElementById('district');
+			const wardSelect = document.getElementById('ward');
+			const provinceNameField = document.getElementById('provinceName');
+			const districtNameField = document.getElementById('districtName');
+			const wardNameField = document.getElementById('wardName');
+			const locationField = document.getElementById('location');
+
+			function updateProvinceField() {
+				if (provinceSelect && provinceNameField) {
+					const selectedOption = provinceSelect.options[provinceSelect.selectedIndex];
+					if (selectedOption && selectedOption.value) {
+						provinceNameField.value = selectedOption.textContent || '';
+						// Update location for backward compatibility
+						if (locationField) {
+							locationField.value = selectedOption.value || '';
+						}
+					}
+				}
+			}
+
+			function updateDistrictField() {
+				if (districtSelect && districtNameField) {
+					const selectedOption = districtSelect.options[districtSelect.selectedIndex];
+					if (selectedOption && selectedOption.value) {
+						districtNameField.value = selectedOption.textContent || '';
+					}
+				}
+			}
+
+			function updateWardField() {
+				if (wardSelect && wardNameField) {
+					const selectedOption = wardSelect.options[wardSelect.selectedIndex];
+					if (selectedOption && selectedOption.value) {
+						wardNameField.value = selectedOption.textContent || '';
+					}
+				}
+			}
+
+			if (provinceSelect) {
+				provinceSelect.addEventListener('change', updateProvinceField);
+			}
+
+			if (districtSelect) {
+				districtSelect.addEventListener('change', updateDistrictField);
+			}
+
+			if (wardSelect) {
+				wardSelect.addEventListener('change', updateWardField);
+			}
+			
+			// Also update fields on form submit to ensure values are set
+			const form = document.querySelector('form[th\\:action="@{/auth/register}"]');
+			if (form) {
+				form.addEventListener('submit', function(e) {
+					updateProvinceField();
+					updateDistrictField();
+					updateWardField();
+				});
+			}
+
+			var modalEl = document.getElementById('registerSuccessModal');
+			if (modalEl && modalEl.classList.contains('show')) {
+				var modal = new bootstrap.Modal(modalEl, {
+					backdrop : 'static'
+				});
+				modal.show();
+			}
+		});
+	</script>
+</body>
+</html>
